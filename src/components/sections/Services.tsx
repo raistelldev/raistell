@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Check } from "lucide-react";
 import { Section } from "@/components/Section";
 import { pilot } from "@/config/site";
@@ -13,53 +13,13 @@ export function Services() {
   const [activeFormat, setActiveFormat] = useState<FormatId>(
     pilot.company.formats[0].id,
   );
-  const [stickyCta, setStickyCta] = useState(false);
-  const ctaRegionRef = useRef<HTMLDivElement>(null);
-
-  // Sticky CTA auf Mobile, sobald der Benefit-/CTA-Bereich erreicht ist.
-  useEffect(() => {
-    if (audience !== "company") {
-      setStickyCta(false);
-      return;
-    }
-
-    const el = ctaRegionRef.current;
-    if (!el) return;
-
-    const mq = window.matchMedia("(max-width: 767px)");
-    const update = () => {
-      if (!mq.matches) {
-        setStickyCta(false);
-        return;
-      }
-      const rect = el.getBoundingClientRect();
-      // Erreicht = Oberkante der Region unter der Viewport-Unterkante oder sichtbar/darüber.
-      const reached = rect.top < window.innerHeight;
-      const stillInSection = rect.bottom > 80;
-      setStickyCta(reached && stillInSection);
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    mq.addEventListener("change", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      mq.removeEventListener("change", update);
-    };
-  }, [audience]);
 
   const activeFormatData =
     pilot.company.formats.find((f) => f.id === activeFormat) ??
     pilot.company.formats[0];
 
   return (
-    <Section
-      id="dienstleistungen"
-      tone="light"
-      className={stickyCta ? "pb-24 md:pb-0" : ""}
-    >
+    <Section id="dienstleistungen" tone="light">
       {/* Segmented Control */}
       <div className="mx-auto flex w-full max-w-md justify-center">
         <div
@@ -99,8 +59,6 @@ export function Services() {
           activeFormat={activeFormat}
           setActiveFormat={setActiveFormat}
           activeFormatData={activeFormatData}
-          ctaRegionRef={ctaRegionRef}
-          stickyCta={stickyCta}
         />
       ) : (
         <CreatorView />
@@ -113,14 +71,10 @@ function CompanyView({
   activeFormat,
   setActiveFormat,
   activeFormatData,
-  ctaRegionRef,
-  stickyCta,
 }: {
   activeFormat: FormatId;
   setActiveFormat: (id: FormatId) => void;
   activeFormatData: (typeof pilot.company.formats)[number];
-  ctaRegionRef: React.RefObject<HTMLDivElement | null>;
-  stickyCta: boolean;
 }) {
   const { company } = pilot;
 
@@ -213,7 +167,7 @@ function CompanyView({
       </div>
 
       {/* Was Sie davon haben + CTA */}
-      <div ref={ctaRegionRef} className="mt-12 sm:mt-14 md:mt-16">
+      <div className="mt-12 sm:mt-14 md:mt-16">
         <h3 className="font-brand text-xl font-semibold text-ink sm:text-2xl">
           Was Sie davon haben
         </h3>
@@ -224,26 +178,11 @@ function CompanyView({
         <a
           href={company.ctaHref}
           onClick={() => setContactRole("firma")}
-          className={`mt-8 inline-flex w-full items-center justify-center rounded-theme bg-brand px-6 py-3.5 text-center text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong sm:w-auto ${
-            stickyCta ? "invisible md:visible" : ""
-          }`}
+          className="mt-8 inline-flex w-full items-center justify-center rounded-theme bg-brand px-6 py-3.5 text-center text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong sm:w-auto"
         >
           {company.cta}
         </a>
       </div>
-
-      {/* Sticky CTA – nur Mobile, sobald Bereich erreicht */}
-      {stickyCta && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-page/95 p-3 backdrop-blur md:hidden">
-          <a
-            href={company.ctaHref}
-            onClick={() => setContactRole("firma")}
-            className="flex w-full items-center justify-center rounded-theme bg-brand px-6 py-3.5 text-sm font-semibold text-on-brand"
-          >
-            {company.cta}
-          </a>
-        </div>
-      )}
     </div>
   );
 }
