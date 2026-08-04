@@ -3,7 +3,7 @@ import { site } from "@/config/site";
 
 export function Hero() {
   return (
-    <section id="start" className="scroll-mt-24 bg-dark">
+    <section id="start" className="scroll-mt-16 bg-dark">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:py-20 md:grid-cols-2 md:py-28">
         {/* Text + CTA */}
         <div className="text-center md:text-left">

@@ -22,7 +22,7 @@ export function Section({
           ? "bg-surface-alt"
           : "bg-page";
   return (
-    <section id={id} className={`scroll-mt-24 ${bg} ${className}`}>
+    <section id={id} className={`scroll-mt-16 ${bg} ${className}`}>
       <div className="mx-auto max-w-6xl px-4 py-20 sm:py-28 md:py-32">
         {children}
       </div>

@@ -19,13 +19,13 @@ export function Services() {
     pilot.company.formats[0];
 
   return (
-    <Section id="dienstleistungen" tone="light">
+    <Section id="dienstleistungen" tone="alt">
       {/* Segmented Control */}
       <div className="mx-auto flex w-full max-w-md justify-center">
         <div
           role="tablist"
           aria-label="Zielgruppe"
-          className="flex w-full rounded-full bg-surface-alt p-1"
+          className="flex w-full rounded-full border border-line bg-surface p-1"
         >
           {(
             [
@@ -137,7 +137,7 @@ function CompanyView({
                 className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
                   active
                     ? "bg-brand text-on-brand"
-                    : "bg-surface-alt text-ink-soft hover:text-ink"
+                    : "border border-line bg-surface text-ink-soft hover:text-ink"
                 }`}
               >
                 {format.title}

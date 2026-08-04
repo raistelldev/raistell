@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import { Logo } from "./Logo";
 import { navItems } from "@/config/site";
 
+const SECTION_IDS = navItems.map((item) => item.href.replace("#", ""));
+
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState("#start");
 
   // Menü bei Wechsel auf Desktop-Breite schließen
   useEffect(() => {
@@ -15,12 +18,50 @@ export function Header() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // Aktive Sektion anhand Scroll-Position markieren
+  useEffect(() => {
+    const elements = SECTION_IDS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => Boolean(el),
+    );
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]?.target.id) {
+          setActiveHref(`#${visible[0].target.id}`);
+        }
+      },
+      {
+        rootMargin: "-20% 0px -55% 0px",
+        threshold: [0.1, 0.25, 0.5, 0.75],
+      },
+    );
+
+    for (const el of elements) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  function navClass(href: string, mobile = false) {
+    const active = activeHref === href;
+    if (mobile) {
+      return active
+        ? "block rounded-theme px-3 py-3 text-base font-semibold text-brand"
+        : "block rounded-theme px-3 py-3 text-base font-medium text-ink/75 hover:text-ink";
+    }
+    return active
+      ? "rounded-full px-3 py-2 text-sm font-semibold text-brand"
+      : "rounded-full px-3 py-2 text-sm font-medium text-ink/70 transition-colors hover:text-ink";
+  }
+
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-page/90 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-4">
+    <header className="header-facet sticky top-0 z-50 border-b border-line">
+      <div className="relative mx-auto max-w-6xl px-4">
         {/* ---------- MOBILE (< md): Name mittig, Burger rechts ---------- */}
         <div className="relative flex h-16 items-center justify-center md:hidden">
-          <Logo variant="stacked" />
+          <Logo variant="stacked" className="text-ink" />
 
           <button
             type="button"
@@ -28,7 +69,7 @@ export function Header() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Menü schließen" : "Menü öffnen"}
-            className="absolute right-0 inline-flex h-11 w-11 items-center justify-center rounded-theme text-ink hover:bg-surface-alt"
+            className="absolute right-0 inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-surface/50"
           >
             {open ? (
               <CloseIcon className="h-6 w-6" />
@@ -40,14 +81,15 @@ export function Header() {
 
         {/* ---------- DESKTOP (>= md): Logo links, Nav rechts ---------- */}
         <div className="hidden h-16 items-center justify-between md:flex">
-          <Logo variant="inline" />
+          <Logo variant="inline" className="text-ink" />
           <nav aria-label="Hauptnavigation">
-            <ul className="flex items-center gap-1">
+            <ul className="flex items-center gap-0.5">
               {navItems.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    className="rounded-theme px-3 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-alt hover:text-ink"
+                    aria-current={activeHref === item.href ? "true" : undefined}
+                    className={navClass(item.href)}
                   >
                     {item.label}
                   </a>
@@ -56,7 +98,7 @@ export function Header() {
               <li>
                 <a
                   href="#kontakt"
-                  className="ml-2 rounded-theme bg-brand px-4 py-2 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong"
+                  className="ml-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong"
                 >
                   Beratung anfragen
                 </a>
@@ -71,25 +113,26 @@ export function Header() {
         <nav
           id="mobile-nav"
           aria-label="Hauptnavigation mobil"
-          className="border-t border-line bg-page md:hidden"
+          className="header-facet relative border-t border-line md:hidden"
         >
-          <ul className="mx-auto max-w-6xl px-4 py-2">
+          <ul className="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-2">
             {navItems.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
+                  aria-current={activeHref === item.href ? "true" : undefined}
                   onClick={() => setOpen(false)}
-                  className="block rounded-theme px-3 py-3 text-base font-medium text-ink hover:bg-surface-alt"
+                  className={navClass(item.href, true)}
                 >
                   {item.label}
                 </a>
               </li>
             ))}
-            <li className="px-1 py-2">
+            <li className="pt-1">
               <a
                 href="#kontakt"
                 onClick={() => setOpen(false)}
-                className="block rounded-theme bg-brand px-4 py-3 text-center text-base font-semibold text-on-brand hover:bg-brand-strong"
+                className="block rounded-full bg-brand px-4 py-3 text-center text-base font-semibold text-on-brand hover:bg-brand-strong"
               >
                 Beratung anfragen
               </a>

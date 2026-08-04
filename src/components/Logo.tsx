@@ -12,9 +12,9 @@ export function Logo({
     <a
       href="#start"
       aria-label={`${site.name} – zur Startseite`}
-      className={`font-brand font-semibold tracking-tight text-ink ${
+      className={`font-brand font-semibold tracking-tight ${
         variant === "stacked" ? "text-lg" : "text-xl"
-      } ${className}`}
+      } ${className || "text-ink"}`}
     >
       {site.name}
     </a>
