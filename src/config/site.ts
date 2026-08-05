@@ -10,9 +10,9 @@
 
 export const site = {
   name: "Raistell",
-  claim: "Wir verbinden Marken mit Menschen.",
+  claim: "Verbindung, die Vertrauen schafft.",
   subclaim:
-    "Vermittlung zwischen Influencern und Unternehmen im Bereich der erneuerbaren Energien.",
+    "Raistell verbindet sorgfältig ausgewählte Unternehmen der Energiewende mit authentischen Creatorn – von der Passungsprüfung bis zur Veröffentlichung.",
 
   contact: {
     email: "kontakt@raistell.de",

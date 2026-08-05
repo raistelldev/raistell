@@ -9,8 +9,8 @@ export function Footer() {
           <div>
             <Logo variant="inline" className="text-on-dark" />
             <p className="mt-4 max-w-xs text-sm text-on-dark/75">
-              Vermittlung zwischen Influencern und Unternehmen der erneuerbaren
-              Energien – für den deutschen Markt.
+              Trust Marketing für die Energiewende – Creator-Kooperationen für
+              den deutschen Markt.
             </p>
           </div>
 

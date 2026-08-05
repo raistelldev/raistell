@@ -14,27 +14,27 @@ export function About() {
         <div>
           <SectionHeading
             eyebrow="Über uns"
-            title="Die Brücke zwischen zwei Welten"
-            intro="Wir verbinden die Reichweite von Creatorn mit den Zielen von Unternehmen der erneuerbaren Energien."
+            title="Verbindung, die Vertrauen schafft."
+            intro="Raistell verbindet sorgfältig ausgewählte Unternehmen der Energiewende mit authentischen Creatorn. Nicht Reichweite allein – sondern Vertrauen, Qualität und echte Passung."
           />
           <div className="mt-6 space-y-4 text-base leading-relaxed text-ink-soft">
             <p>
-              Als Vermittler kennen wir beide Seiten: Wir verstehen, wie Creator
-              arbeiten, und wir wissen, worauf es Marken in der grünen Branche
-              ankommt.
+              Als Kurator und Prozesspartner kennen wir beide Seiten: Wir
+              verstehen, wie Creator arbeiten, und wissen, worauf es Unternehmen
+              der Energiewende ankommt.
             </p>
             <p>
-              Wir starten frisch und mit klarem Fokus – persönlich, ehrlich und
-              ohne unnötigen Ballast. Genau das geben wir an unsere Partner
-              weiter.
+              Wir starten bewusst klein und mit klarem Fokus – persönlich,
+              ehrlich und ohne unnötigen Ballast. Genau das geben wir an unsere
+              Partner weiter.
             </p>
           </div>
 
           <ul className="mt-8 space-y-3">
             {[
-              "Persönliche Betreuung statt anonymer Plattform",
-              "Passgenaue Auswahl nach Werten & Zielgruppe",
-              "Transparente Konditionen und klare Absprachen",
+              "Passung vor Reichweite – wenige relevante Partnerschaften statt einer anonymen Plattform",
+              "Sorgfältige Auswahl nach Werten, Region und Zielgruppe",
+              "Transparente Konditionen und klare Absprachen vor der Zusammenarbeit",
             ].map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm text-ink">
                 <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
