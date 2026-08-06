@@ -89,46 +89,6 @@ body {
   font-optical-sizing: auto;
 }
 
-/* ---------- Hero: Connection-Animation ---------- */
-.connection-pulse {
-  fill: none;
-  stroke-width: 1.75;
-  transform-box: fill-box;
-  transform-origin: center;
-  opacity: 0.45;
-  animation: connection-pulse 2.6s ease-out infinite;
-}
-
-.connection-pulse-a {
-  animation-delay: 0s;
-}
-
-.connection-pulse-b {
-  animation-delay: 1.3s;
-}
-
-@keyframes connection-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.45;
-  }
-  100% {
-    transform: scale(1.28);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .connection-pulse {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-
-  .connection-dot {
-    display: none !important;
-  }
-}
-
 /* Header: Gebäude-Foto + leichte Wash */
 .header-facet {
   background-color: var(--color-page);
