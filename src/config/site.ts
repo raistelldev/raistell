@@ -4,35 +4,21 @@
   ------------------------------------------------------------
   Firmenname, Navigation, Texte und Kontaktdaten an EINER
   Stelle. Zum Anpassen des Prototyps nur diese Datei ändern.
-
   ============================================================
 */
 
 export const site = {
   name: "Raistell",
-  claim: "Verbindung, die Vertrauen schafft.",
-  subclaim:
-    "Raistell verbindet sorgfältig ausgewählte Unternehmen der Energiewende mit authentischen Creatorn – von der Passungsprüfung bis zur Veröffentlichung.",
-
   contact: {
     email: "kontakt@raistell.de",
-    // Optionale Kontaktangaben – bei Bedarf ausfüllen.
     phone: "",
   },
-
-  /*
-    Rechtliche Angaben (Platzhalter).
-    Anbieter sitzt in Bosnien und Herzegowina (außerhalb EU/EWR), die Seite
-    richtet sich aber an den deutschen Markt -> deutsche Informationspflichten
-    gelten (Marktortprinzip). Adresse ist die echte Geschäftsadresse im Ausland.
-  */
   legal: {
     providerName: "[Vor- und Nachname / Firma]",
     street: "[Straße und Hausnummer]",
     city: "[PLZ und Ort]",
     country: "Bosnien und Herzegowina",
     registerInfo: "[Registernummer / JIB, falls vorhanden]",
-    // Vertreter in der EU nach Art. 27 DSGVO (für Anbieter ohne EU-Niederlassung).
     euRepresentative: {
       name: "[Name des EU-Vertreters]",
       address: "[Anschrift in einem EU-Mitgliedstaat]",
@@ -41,14 +27,303 @@ export const site = {
   },
 } as const;
 
+export type Audience = "firma" | "creator";
+
 export type NavItem = { label: string; href: string };
 
-export const navItems: NavItem[] = [
-  { label: "Start", href: "#start" },
-  { label: "Dienstleistungen", href: "#dienstleistungen" },
-  { label: "Kontakt", href: "#kontakt" },
-  { label: "Über uns", href: "#ueber-uns" },
-];
+/** Die zwei zentralen CTAs. */
+export const ctas = {
+  company: {
+    label: "Kostenloses Erstgespräch vereinbaren",
+    shortLabel: "Erstgespräch vereinbaren",
+    href: "/?role=firma#kontakt",
+    role: "firma" as const,
+  },
+  creator: {
+    label: "Netzwerk beitreten",
+    finalLabel: "Teil unseres Creator-Netzwerks werden",
+    href: "/?role=creator#kontakt",
+    role: "creator" as const,
+  },
+} as const;
+
+export const navByAudience: Record<Audience, NavItem[]> = {
+  firma: [
+    { label: "Start", href: "#start" },
+    { label: "Warum", href: "#problem" },
+    { label: "Ablauf", href: "#ablauf" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Kontakt", href: "#kontakt" },
+  ],
+  creator: [
+    { label: "Start", href: "#start" },
+    { label: "Lösung", href: "#loesung" },
+    { label: "Ablauf", href: "#ablauf" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Kontakt", href: "#kontakt" },
+  ],
+};
+
+/** @deprecated – Footer/Header nutzen navByAudience; Fallback für Legacy. */
+export const navItems = navByAudience.firma;
+
+export const formOptions = {
+  platforms: ["Instagram", "YouTube", "TikTok", "LinkedIn", "Andere"] as const,
+  followerRanges: [
+    "unter 10 Tsd.",
+    "10–50 Tsd.",
+    "50–250 Tsd.",
+    "über 250 Tsd.",
+  ] as const,
+  bundeslaender: [
+    "Baden-Württemberg",
+    "Bayern",
+    "Berlin",
+    "Brandenburg",
+    "Bremen",
+    "Hamburg",
+    "Hessen",
+    "Mecklenburg-Vorpommern",
+    "Niedersachsen",
+    "Nordrhein-Westfalen",
+    "Rheinland-Pfalz",
+    "Saarland",
+    "Sachsen",
+    "Sachsen-Anhalt",
+    "Schleswig-Holstein",
+    "Thüringen",
+    "Außerhalb Deutschlands",
+  ] as const,
+  seeking: [
+    "Sponsoring",
+    "Projekt-Content",
+    "Vertrauensformat",
+    "Partnerschaft",
+    "Noch offen / Beratung",
+  ] as const,
+  budgets: [
+    "noch offen",
+    "bis 5.000 €",
+    "5.000–20.000 €",
+    "über 20.000 €",
+  ] as const,
+} as const;
+
+/* ---------- Funnel: Unternehmen ---------- */
+
+export const companyFunnel = {
+  hero: {
+    eyebrow: "Für Unternehmen der Energiewende",
+    title: "Authentische Creator für Photovoltaik, Wärmepumpe und Smart Energy.",
+    subtitle:
+      "Wir verbinden Unternehmen aus den Bereichen Photovoltaik, Wärmepumpe und Smart Energy mit sorgfältig ausgewählten Creatorn, die Vertrauen schaffen und Ihre Produkte verständlich präsentieren.",
+  },
+  problem: {
+    eyebrow: "Das Problem",
+    title: "Gute Produkte allein reichen heute nicht mehr.",
+    points: [
+      "Menschen kaufen dort, wo Vertrauen entsteht.",
+      "Klassische Werbung wird zunehmend ignoriert.",
+      "Authentische Creator können komplexe Produkte verständlich erklären.",
+    ],
+  },
+  whyCreators: {
+    eyebrow: "Warum Creator?",
+    title: "Ein Banner verkauft. Ein Creator überzeugt.",
+    ad: {
+      label: "Ein Werbebanner sagt:",
+      text: "„Kauf dieses Produkt.“",
+    },
+    creator: {
+      label: "Ein Creator zeigt:",
+      text: "„Ich nutze dieses Produkt.“",
+    },
+  },
+  whyRaistell: {
+    eyebrow: "Warum Raistell?",
+    title: "Wir übernehmen den gesamten Prozess.",
+    points: [
+      "Passende Creator finden",
+      "Briefing",
+      "Vertragsabwicklung",
+      "Projektkoordination",
+      "Qualitätssicherung",
+    ],
+  },
+  process: {
+    eyebrow: "So läuft es ab",
+    title: "Von der Anfrage bis zur Veröffentlichung.",
+    steps: [
+      { n: "01", title: "Erstgespräch" },
+      { n: "02", title: "Creator Matching" },
+      { n: "03", title: "Content-Produktion" },
+      { n: "04", title: "Veröffentlichung" },
+    ],
+  },
+  trust: {
+    eyebrow: "Warum uns vertrauen?",
+    title: "Klarer Fokus. Saubere Abläufe.",
+    points: [
+      "Fokus ausschließlich auf die Energiewende",
+      "Regional passende Creator",
+      "Standardisierte Briefings",
+      "Strukturierte Projektabwicklung",
+      "Ein laufender Ansprechpartner",
+    ],
+  },
+  founding: {
+    eyebrow: "Warum wir Raistell gegründet haben",
+    title: "Weil Unternehmen und Creator oft nicht zusammenfinden.",
+    text: "Während meiner Arbeit im Vertrieb der Energiewende fiel mir immer wieder auf, dass Unternehmen und Creator oft nicht zusammenfinden – obwohl beide voneinander profitieren könnten. Genau daraus entstand Raistell.",
+    name: {
+      title: "Woher der Name kommt",
+      intro: "Ein Name, inspiriert von Verbindung über Distanz.",
+      parts: [
+        {
+          n: "01",
+          title: "Raisting",
+          text: "Ein deutscher Ort mit besonderer Geschichte in der Satellitenkommunikation. Dort wurde Deutschlands erste kommerziell betriebene Satelliten-Bodenstation errichtet.",
+        },
+        {
+          n: "02",
+          title: "Telstar",
+          text: "Ein früher Kommunikationssatellit, der Fernsehsignale zwischen Europa und Nordamerika übertrug. Seine Oberfläche war mit Solarzellen bedeckt.",
+        },
+      ],
+      closing:
+        "Aus Raisting und Telstar entstand Raistell. Die Idee dahinter bleibt aktuell: Verbindungen schaffen, die ohne den richtigen Vermittler nicht entstehen würden.",
+    },
+  },
+  faq: {
+    eyebrow: "",
+    title: "FAQ",
+    items: [
+      {
+        q: "Was kostet eine Zusammenarbeit?",
+        a: "Die Kosten richten sich nach dem Umfang des Projekts sowie dem ausgewählten Creator. Im kostenlosen Erstgespräch besprechen wir Ihre Ziele und erstellen eine individuelle Empfehlung.",
+      },
+      {
+        q: "Wie werden Creator ausgewählt?",
+        a: "Jeder Creator wird hinsichtlich Themengebiet, Region und Content-Qualität geprüft. So stellen wir sicher, dass Unternehmen und Creator fachlich und menschlich zusammenpassen.",
+      },
+      {
+        q: "Wer besitzt die Nutzungsrechte?",
+        a: "Die Nutzungsrechte werden vor Projektbeginn transparent vereinbart. So wissen beide Seiten von Anfang an, welche Inhalte wie verwendet werden dürfen.",
+      },
+      {
+        q: "Wie lange dauert ein Projekt?",
+        a: "Die Projektdauer hängt vom Umfang und den individuellen Anforderungen ab. Nach dem Erstgespräch erhalten Sie eine realistische Einschätzung des weiteren Ablaufs.",
+      },
+      {
+        q: "Gibt es Mindestlaufzeiten?",
+        a: "Nein. Jede Zusammenarbeit wird individuell geplant und auf die jeweiligen Projektziele abgestimmt.",
+      },
+      {
+        q: "Was passiert, wenn aktuell kein passender Creator verfügbar ist?",
+        a: "Qualität steht für uns an erster Stelle. Sollte aktuell kein passender Creator verfügbar sein, kommunizieren wir das offen und suchen gemeinsam nach einer geeigneten Lösung.",
+      },
+      {
+        q: "Wie startet eine Zusammenarbeit?",
+        a: "Die Zusammenarbeit beginnt mit einem unverbindlichen Erstgespräch. Dabei lernen wir Ihr Unternehmen und Ihre Ziele kennen und besprechen die nächsten Schritte.",
+      },
+    ],
+  },
+  closing: {
+    title:
+      "Lassen Sie uns unverbindlich besprechen, welche Creator zu Ihrem Unternehmen passen.",
+  },
+} as const;
+
+/* ---------- Funnel: Creator ---------- */
+
+export const creatorFunnel = {
+  hero: {
+    eyebrow: "Für Creator",
+    title: "Finde passende Kooperationen mit Unternehmen der Energiewende.",
+    subtitle:
+      "Wir bringen Creator und Unternehmen zusammen, die fachlich, regional und menschlich zueinander passen.",
+  },
+  problem: {
+    eyebrow: "Das Problem",
+    title: "Gute Kooperationen zu finden, kostet Zeit.",
+    points: [
+      "Die Suche nach passenden Kooperationen kostet Zeit.",
+      "Viele Anfragen passen nicht zum eigenen Content.",
+      "Häufig fehlen klare Briefings oder faire Abläufe.",
+    ],
+  },
+  solution: {
+    eyebrow: "Unsere Lösung",
+    title: "Wir übernehmen den organisatorischen Teil.",
+    text: "Damit du dich auf deinen Content konzentrieren kannst.",
+  },
+  whyRaistell: {
+    eyebrow: "Warum Raistell?",
+    title: "Was du von uns bekommst.",
+    points: [
+      "Unternehmen aus der Energiewende",
+      "Passende Kooperationen statt Massenanfragen",
+      "Klare Briefings",
+      "Strukturierte Kommunikation",
+      "Transparente Abläufe",
+      "Ein Ansprechpartner",
+    ],
+  },
+  process: {
+    eyebrow: "So läuft die Zusammenarbeit",
+    title: "Klarer Ablauf. Mehr Sicherheit.",
+    steps: [
+      { n: "01", title: "Bewerbung" },
+      { n: "02", title: "Kennenlernen" },
+      { n: "03", title: "Aufnahme ins Netzwerk" },
+      { n: "04", title: "Passende Projekte erhalten" },
+      { n: "05", title: "Content produzieren" },
+      { n: "06", title: "Auszahlung" },
+    ],
+  },
+  seeking: {
+    eyebrow: "Wen wir suchen",
+    title: "Wir suchen Creator, die …",
+    points: [
+      "authentisch auftreten",
+      "hochwertige Inhalte produzieren",
+      "Interesse an erneuerbaren Energien haben",
+      "langfristige Partnerschaften schätzen",
+    ],
+  },
+  faq: {
+    eyebrow: "",
+    title: "FAQ",
+    items: [
+      {
+        q: "Muss ich exklusiv mit Raistell arbeiten?",
+        a: "Nein. Du entscheidest selbst, welche Kooperationen du annimmst.",
+      },
+      {
+        q: "Kostet die Aufnahme etwas?",
+        a: "Nein. Die Aufnahme in unser Netzwerk ist kostenlos.",
+      },
+      {
+        q: "Muss ich jedes Projekt annehmen?",
+        a: "Nein. Du entscheidest selbst, welche Projekte zu dir passen.",
+      },
+      {
+        q: "Wann bekomme ich Anfragen?",
+        a: "Sobald ein Unternehmen zu deinem Profil passt, melden wir uns bei dir.",
+      },
+      {
+        q: "Wie werde ich bezahlt?",
+        a: "Die Vergütung wird vor jedem Projekt transparent vereinbart.",
+      },
+    ],
+  },
+  closing: {
+    title: "Teil unseres Creator-Netzwerks werden",
+    text: "Bewirb dich unverbindlich – wir melden uns, wenn es passt.",
+  },
+} as const;
+
+/* Detailseiten Formate (Legacy / /dienstleistungen/[slug]) */
 
 export type Service = {
   slug: string;
@@ -59,90 +334,6 @@ export type Service = {
   points: string[];
 };
 
-/** Inhalte für die Dienstleistungen-Sektion (Unternehmen / Creator). */
-export const pilot = {
-  company: {
-    title: "Raistell Pilot",
-    subtitle: "Ein klarer Einstieg in eine glaubwürdige Creator-Kooperation.",
-    description:
-      "Wir finden heraus, was Ihr Unternehmen erreichen will, wählen den passenden Creator aus und organisieren die Zusammenarbeit – von der Idee bis zur Veröffentlichung.",
-    included: [
-      "Ziel- und Fit-Check",
-      "Auswahl und Match-Prüfung des passenden Creators",
-      "Gemeinsames Briefing",
-      "Klärung von Vergütung, Timing, Rechten und Freigaben",
-      "Ein Ansprechpartner bis zur Veröffentlichung",
-      "Kurzes Review nach dem Livegang",
-    ],
-    formats: [
-      {
-        id: "sponsoring",
-        title: "Sponsoring",
-        recommended: true,
-        text: "Eine kurze, glaubwürdige Erwähnung Ihres Unternehmens oder Produkts. Einfach, schnell umsetzbar – der ideale Einstieg.",
-      },
-      {
-        id: "projekt-content",
-        title: "Projekt-Content",
-        recommended: false,
-        text: "Einblicke in eine Baustelle, Montage oder ein konkretes Kundenprojekt.",
-      },
-      {
-        id: "vertrauensformat",
-        title: "Vertrauensformat",
-        recommended: false,
-        text: "Kundenstimmen oder Vorher-Nachher-Formate, die echte Ergebnisse zeigen.",
-      },
-      {
-        id: "partnerschaft",
-        title: "Partnerschaft",
-        recommended: false,
-        text: "Regelmäßige Zusammenarbeit über mehrere Themen und einen längeren Zeitraum.",
-      },
-    ],
-    formatsNote: "Mehr als ein Creator? Auf Anfrage möglich.",
-    benefit:
-      "Ihr Produkt wird sichtbar. Ihre Leistung wird verständlicher. Vertrauen entsteht über die Stimme des Creators – nicht über Werbung allein.",
-    cta: "Erste Creator-Kooperation prüfen",
-    ctaHref: "/?role=firma#kontakt",
-  },
-  creator: {
-    title: "Du bleibst die Stimme deiner Community.",
-    description:
-      "Wir bringen dich mit Unternehmen zusammen, die zu dir passen – und übernehmen den Rahmen drumherum.",
-    benefits: [
-      {
-        title: "Passende Anfragen",
-        text: "Keine beliebigen Sponsoren. Nur Unternehmen, die geprüft wurden und zu deinem Kanal passen.",
-      },
-      {
-        title: "Klare Bedingungen",
-        text: "Vergütung, Timing, Rechte und Freigaben werden vorab geklärt – nicht erst im Nachhinein verhandelt.",
-      },
-      {
-        title: "Volle kreative Freiheit",
-        text: "Der Stil, die Sprache, die Einordnung – das bleibt bei dir.",
-      },
-      {
-        title: "Weniger Aufwand",
-        text: "Wir kümmern uns um Briefing, Kommunikation und offene Fragen.",
-      },
-      {
-        title: "Wir sagen auch Nein",
-        text: "Wenn ein Unternehmen oder ein Format nicht zu dir passt, kommt die Anfrage gar nicht erst bei dir an.",
-      },
-      {
-        title: "Mehr als eine Kampagne",
-        text: "Aus einer Kooperation kann eine echte, langfristige Partnerschaft werden.",
-      },
-    ],
-    note: "Keine automatische Exklusivität. Keine Massenanfragen. Jede Kooperation wird einzeln geprüft.",
-    cta: "Interesse anmelden",
-    ctaHref: "/?role=creator#kontakt",
-  },
-} as const;
-
-/** Detailseiten unter /dienstleistungen/[slug] – Formate aus dem Pilot. */
 export const services: Service[] = [
   {
     slug: "sponsoring",

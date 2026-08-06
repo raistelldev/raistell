@@ -1,7 +1,13 @@
+"use client";
+
 import { Logo } from "./Logo";
-import { navItems, site } from "@/config/site";
+import { useAudience } from "@/components/AudienceContext";
+import { navByAudience, site } from "@/config/site";
 
 export function Footer() {
+  const { audience } = useAudience();
+  const navItems = navByAudience[audience];
+
   return (
     <footer className="bg-dark">
       <div className="mx-auto max-w-6xl px-4 py-12">
@@ -9,8 +15,8 @@ export function Footer() {
           <div>
             <Logo variant="inline" className="text-on-dark" />
             <p className="mt-4 max-w-xs text-sm text-on-dark/75">
-              Trust Marketing für die Energiewende – Creator-Kooperationen für
-              den deutschen Markt.
+              Creator-Kooperationen für Unternehmen der Energiewende –
+              Photovoltaik, Wärmepumpe und Smart Energy.
             </p>
           </div>
 
@@ -19,7 +25,10 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               {navItems.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} className="text-sm text-on-dark/75 hover:text-on-dark">
+                  <a
+                    href={item.href}
+                    className="text-sm text-on-dark/75 hover:text-on-dark"
+                  >
                     {item.label}
                   </a>
                 </li>
@@ -31,12 +40,18 @@ export function Footer() {
             <p className="text-sm font-semibold text-on-dark">Rechtliches</p>
             <ul className="mt-3 space-y-2">
               <li>
-                <a href="/impressum" className="text-sm text-on-dark/75 hover:text-on-dark">
+                <a
+                  href="/impressum"
+                  className="text-sm text-on-dark/75 hover:text-on-dark"
+                >
                   Impressum
                 </a>
               </li>
               <li>
-                <a href="/datenschutz" className="text-sm text-on-dark/75 hover:text-on-dark">
+                <a
+                  href="/datenschutz"
+                  className="text-sm text-on-dark/75 hover:text-on-dark"
+                >
                   Datenschutzerklärung
                 </a>
               </li>

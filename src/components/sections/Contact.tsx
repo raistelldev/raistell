@@ -1,283 +1,483 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useId, useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAudience } from "@/components/AudienceContext";
 import { Section, SectionHeading } from "@/components/Section";
-import { site } from "@/config/site";
-
-type Role = "creator" | "firma";
-
-function roleFromUrl(): Role | null {
-  if (typeof window === "undefined") return null;
-  const value = new URLSearchParams(window.location.search).get("role");
-  if (value === "firma" || value === "creator") return value;
-  return null;
-}
+import { ctas, formOptions, site } from "@/config/site";
 
 export function Contact() {
-  const [role, setRole] = useState<Role>("creator");
-  const [sent, setSent] = useState(false);
+  const router = useRouter();
+  const { audience, setAudience } = useAudience();
+  const [platforms, setPlatforms] = useState<string[]>([]);
+  const [platformError, setPlatformError] = useState(false);
 
-  // Rolle aus URL / CTA (Dienstleistungen) übernehmen
   useEffect(() => {
-    const syncFromUrl = () => {
-      const next = roleFromUrl();
-      if (next) setRole(next);
-    };
-    const syncFromEvent = (event: Event) => {
-      const next = (event as CustomEvent<Role>).detail;
-      if (next === "firma" || next === "creator") setRole(next);
-    };
-    syncFromUrl();
-    window.addEventListener("popstate", syncFromUrl);
-    window.addEventListener("hashchange", syncFromUrl);
-    window.addEventListener("raistell:contact-role", syncFromEvent);
-    return () => {
-      window.removeEventListener("popstate", syncFromUrl);
-      window.removeEventListener("hashchange", syncFromUrl);
-      window.removeEventListener("raistell:contact-role", syncFromEvent);
-    };
-  }, []);
+    setPlatforms([]);
+    setPlatformError(false);
+  }, [audience]);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (audience === "creator" && platforms.length === 0) {
+      setPlatformError(true);
+      return;
+    }
+    router.push(`/danke?role=${audience}`);
+  }
+
+  const submitLabel =
+    audience === "firma" ? ctas.company.label : ctas.creator.finalLabel;
+
+  const heading =
+    audience === "firma"
+      ? {
+          title: "Kostenloses Erstgespräch vereinbaren",
+          intro:
+            "Unverbindlich und kostenlos. Wir melden uns persönlich bei Ihnen.",
+        }
+      : {
+          title: "Teil unseres Creator-Netzwerks werden",
+          intro: "Kurz bewerben – wir melden uns, wenn es passt.",
+        };
 
   return (
     <Section id="kontakt" tone="dark">
       <SectionHeading
-        eyebrow="Kontakt"
-        title="Lassen Sie uns sprechen"
-        intro="Schreiben Sie uns oder buchen Sie direkt einen Termin. Sagen Sie uns zuerst, wer Sie sind – dann zeigen wir die passenden Felder."
+        eyebrow="Nächster Schritt"
+        title={heading.title}
+        intro={heading.intro}
         center
         onDark
       />
 
-      {/* Umschalter Creator / Unternehmen */}
       <div className="mt-8 flex justify-center">
         <div
           role="tablist"
           aria-label="Ich bin"
           className="inline-flex rounded-full border border-line bg-surface p-1"
         >
-          <ToggleButton active={role === "creator"} onClick={() => setRole("creator")}>
-            Ich bin Creator
+          <ToggleButton
+            active={audience === "firma"}
+            onClick={() => setAudience("firma")}
+          >
+            Unternehmen
           </ToggleButton>
-          <ToggleButton active={role === "firma"} onClick={() => setRole("firma")}>
-            Ich bin Unternehmen
+          <ToggleButton
+            active={audience === "creator"}
+            onClick={() => setAudience("creator")}
+          >
+            Creator
           </ToggleButton>
         </div>
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-5">
-        {/* Formular */}
-        <div className="rounded-theme border border-line bg-surface p-6 sm:p-8 lg:col-span-3">
-          {sent ? (
-            <div className="flex h-full min-h-64 flex-col items-center justify-center text-center">
-              <p className="text-lg font-semibold text-ink">Danke für Ihre Nachricht!</p>
-              <p className="mt-2 text-sm text-ink-soft">
-                (Mockup – es wird noch nichts versendet oder gespeichert.)
-              </p>
-              <button
-                type="button"
-                onClick={() => setSent(false)}
-                className="mt-6 text-sm font-medium text-brand hover:text-brand-strong"
-              >
-                Neues Formular
-              </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSent(true);
+      <div className="mx-auto mt-10 max-w-2xl rounded-theme border border-line bg-surface p-6 sm:p-8">
+        <form onSubmit={handleSubmit} className="space-y-4" key={audience}>
+          {audience === "creator" ? (
+            <CreatorFields
+              platforms={platforms}
+              setPlatforms={(next) => {
+                setPlatforms(next);
+                if (next.length > 0) setPlatformError(false);
               }}
-              className="space-y-4"
-            >
-              {/* Gemeinsame Felder */}
-              <Field label="Name" htmlFor="name">
-                <input id="name" name="name" type="text" required className={inputCls} />
-              </Field>
-              <Field label="E-Mail" htmlFor="email">
-                <input id="email" name="email" type="email" required className={inputCls} />
-              </Field>
-
-              {/* Rollen-spezifische Beispiel-Felder */}
-              {role === "creator" ? (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Plattform" htmlFor="platform">
-                    <Select id="platform" name="platform" defaultValue="">
-                      <option value="" disabled>
-                        Bitte wählen
-                      </option>
-                      <option>Instagram</option>
-                      <option>TikTok</option>
-                      <option>YouTube</option>
-                      <option>LinkedIn</option>
-                      <option>Andere</option>
-                    </Select>
-                  </Field>
-                  <Field label="Profil / Handle" htmlFor="handle">
-                    <input id="handle" name="handle" type="text" placeholder="@…" className={inputCls} />
-                  </Field>
-                  <Field label="Reichweite (Follower)" htmlFor="reach">
-                    <Select id="reach" name="reach" defaultValue="">
-                      <option value="" disabled>
-                        Bitte wählen
-                      </option>
-                      <option>unter 10 Tsd.</option>
-                      <option>10–50 Tsd.</option>
-                      <option>50–250 Tsd.</option>
-                      <option>über 250 Tsd.</option>
-                    </Select>
-                  </Field>
-                  <Field label="Themenbereich" htmlFor="topic">
-                    <input id="topic" name="topic" type="text" placeholder="z. B. Nachhaltigkeit" className={inputCls} />
-                  </Field>
-                </div>
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Unternehmen" htmlFor="company">
-                    <input id="company" name="company" type="text" required className={inputCls} />
-                  </Field>
-                  <Field label="Website" htmlFor="website">
-                    <input id="website" name="website" type="url" placeholder="https://…" className={inputCls} />
-                  </Field>
-                  <Field label="Ihre Rolle" htmlFor="position">
-                    <input id="position" name="position" type="text" placeholder="z. B. Marketing" className={inputCls} />
-                  </Field>
-                  <Field label="Budgetrahmen (optional)" htmlFor="budget">
-                    <Select id="budget" name="budget" defaultValue="">
-                      <option value="" disabled>
-                        Bitte wählen
-                      </option>
-                      <option>noch offen</option>
-                      <option>bis 5.000 €</option>
-                      <option>5.000–20.000 €</option>
-                      <option>über 20.000 €</option>
-                    </Select>
-                  </Field>
-                </div>
-              )}
-
-              <Field label="Nachricht" htmlFor="message">
-                <textarea id="message" name="message" rows={4} required className={inputCls} />
-              </Field>
-
-              <label className="flex items-start gap-2 text-xs text-ink-soft">
-                <input type="checkbox" required className="mt-0.5" />
-                <span>
-                  Ich habe die{" "}
-                  <a href="/datenschutz" className="text-brand underline hover:text-brand-strong">
-                    Datenschutzerklärung
-                  </a>{" "}
-                  gelesen und stimme der Verarbeitung meiner Daten zu.
-                </span>
-              </label>
-
-              <button
-                type="submit"
-                className="w-full rounded-theme bg-brand px-6 py-3 text-base font-semibold text-on-brand transition-colors hover:bg-brand-strong"
-              >
-                Nachricht senden
-              </button>
-              <p className="text-center text-xs text-ink-soft">
-                Mockup – später mit Datenbank verbunden. Kontakt:{" "}
-                <a href={`mailto:${site.contact.email}`} className="text-brand hover:text-brand-strong">
-                  {site.contact.email}
-                </a>
-              </p>
-            </form>
+              platformError={platformError}
+            />
+          ) : (
+            <CompanyFields />
           )}
-        </div>
 
-        {/* Calendly-Terminbuchung (Mockup) */}
-        <CalendlyMockup className="lg:col-span-2" />
+          <label className="flex items-start gap-2 pt-2 text-xs text-ink-soft">
+            <input type="checkbox" required className="mt-0.5" />
+            <span>
+              Ich habe die{" "}
+              <a
+                href="/datenschutz"
+                className="text-brand underline hover:text-brand-strong"
+              >
+                Datenschutzerklärung
+              </a>{" "}
+              gelesen und stimme der Verarbeitung meiner Daten zu.
+            </span>
+          </label>
+
+          <button
+            type="submit"
+            className="w-full rounded-theme bg-brand px-6 py-3.5 text-base font-semibold text-on-brand transition-colors hover:bg-brand-strong"
+          >
+            {submitLabel}
+          </button>
+          <p className="text-center text-xs text-ink-soft">
+            Fragen?{" "}
+            <a
+              href={`mailto:${site.contact.email}`}
+              className="text-brand hover:text-brand-strong"
+            >
+              {site.contact.email}
+            </a>
+          </p>
+        </form>
       </div>
     </Section>
   );
 }
 
-function CalendlyMockup({ className = "" }: { className?: string }) {
-  const days = [
-    { d: "Mo", n: 4 },
-    { d: "Di", n: 5 },
-    { d: "Mi", n: 6 },
-    { d: "Do", n: 7 },
-    { d: "Fr", n: 8 },
-  ];
-  const times = ["09:00", "10:30", "13:00", "15:30"];
-  const [day, setDay] = useState<number | null>(null);
-  const [time, setTime] = useState<string | null>(null);
-
+function CreatorFields({
+  platforms,
+  setPlatforms,
+  platformError,
+}: {
+  platforms: string[];
+  setPlatforms: (next: string[]) => void;
+  platformError: boolean;
+}) {
   return (
-    <div className={`rounded-theme border border-line bg-surface p-6 sm:p-8 ${className}`}>
-      <div className="flex items-center gap-2">
-        <CalendarIcon className="h-5 w-5 text-brand" />
-        <h3 className="text-lg font-semibold text-ink">Direkt Termin buchen</h3>
-      </div>
-      <p className="mt-1 text-sm text-ink-soft">
-        15-minütiges Kennenlernen. Wählen Sie Tag und Uhrzeit.
-      </p>
-
-      {/* Tage */}
-      <div className="mt-5">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-          Tag
-        </p>
-        <div className="grid grid-cols-5 gap-2">
-          {days.map((x) => (
-            <button
-              key={x.n}
-              type="button"
-              onClick={() => setDay(x.n)}
-              className={`flex flex-col items-center rounded-theme border py-2 text-sm transition-colors ${
-                day === x.n
-                  ? "border-brand bg-brand text-on-brand"
-                  : "border-line bg-page text-ink hover:bg-surface-alt"
-              }`}
-            >
-              <span className="text-[11px]">{x.d}</span>
-              <span className="font-semibold">{x.n}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Uhrzeiten */}
-      <div className="mt-5">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-          Uhrzeit
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {times.map((t) => (
-            <button
-              key={t}
-              type="button"
-              disabled={day === null}
-              onClick={() => setTime(t)}
-              className={`rounded-theme border px-3 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                time === t
-                  ? "border-brand bg-brand text-on-brand"
-                  : "border-line bg-page text-ink hover:bg-surface-alt"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+    <>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Name" htmlFor="name" required>
+          <input id="name" name="name" type="text" required className={inputCls} />
+        </Field>
+        <Field label="E-Mail" htmlFor="email" required>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Telefonnummer" htmlFor="phone" required>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            required
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Region" htmlFor="region" required>
+          <input
+            id="region"
+            name="region"
+            type="text"
+            required
+            placeholder="z. B. Bayern / DACH"
+            className={inputCls}
+          />
+        </Field>
       </div>
 
-      <button
-        type="button"
-        disabled={day === null || time === null}
-        className="mt-6 w-full rounded-theme bg-brand px-4 py-3 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-40"
+      <PlatformMultiSelect
+        selected={platforms}
+        onChange={setPlatforms}
+        error={platformError}
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Followerzahl" htmlFor="reach" required>
+          <Select id="reach" name="reach" required defaultValue="">
+            <option value="" disabled>
+              Bitte wählen
+            </option>
+            {formOptions.followerRanges.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Themengebiet" htmlFor="topic" required>
+          <input
+            id="topic"
+            name="topic"
+            type="text"
+            required
+            placeholder="z. B. Energiewende, Handwerk"
+            className={inputCls}
+          />
+        </Field>
+      </div>
+
+      <Field
+        label="Was macht deinen Content aus?"
+        htmlFor="about"
+        required
       >
-        {day && time ? `Termin am ${day}. um ${time} buchen` : "Tag & Uhrzeit wählen"}
-      </button>
-      <p className="mt-3 text-center text-xs text-ink-soft">
-        Mockup – Calendly-Einbindung folgt später.
-      </p>
-    </div>
+        <textarea
+          id="about"
+          name="about"
+          rows={4}
+          required
+          placeholder="Erzähl uns kurz über deinen Content …"
+          className={inputCls}
+        />
+      </Field>
+
+      <div className="border-t border-line pt-4">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          Optional
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Media Kit" htmlFor="mediakit" optional>
+            <input
+              id="mediakit"
+              name="mediakit"
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg,.webp"
+              className={`${inputCls} file:mr-3 file:rounded file:border-0 file:bg-brand-soft file:px-2 file:py-1 file:text-xs file:font-semibold file:text-brand`}
+            />
+          </Field>
+          <Field label="Preisvorstellung" htmlFor="price" optional>
+            <input
+              id="price"
+              name="price"
+              type="text"
+              placeholder="z. B. ab 500 €"
+              className={inputCls}
+            />
+          </Field>
+        </div>
+      </div>
+    </>
   );
 }
 
-/* --- kleine Bausteine --- */
+function CompanyFields() {
+  return (
+    <>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Unternehmen" htmlFor="company" required>
+          <input
+            id="company"
+            name="company"
+            type="text"
+            required
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Ansprechpartner" htmlFor="contact" required>
+          <input
+            id="contact"
+            name="contact"
+            type="text"
+            required
+            className={inputCls}
+          />
+        </Field>
+        <Field label="E-Mail" htmlFor="email" required>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Telefon" htmlFor="phone" required>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            required
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Bundesland" htmlFor="state" required>
+          <Select id="state" name="state" required defaultValue="">
+            <option value="" disabled>
+              Bitte wählen
+            </option>
+            {formOptions.bundeslaender.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Branche" htmlFor="industry" required>
+          <input
+            id="industry"
+            name="industry"
+            type="text"
+            required
+            placeholder="z. B. Photovoltaik"
+            className={inputCls}
+          />
+        </Field>
+      </div>
+
+      <Field label="Was wird gesucht?" htmlFor="seeking" required>
+        <Select id="seeking" name="seeking" required defaultValue="">
+          <option value="" disabled>
+            Bitte wählen
+          </option>
+          {formOptions.seeking.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </Select>
+      </Field>
+
+      <Field label="Budget" htmlFor="budget" optional>
+        <Select id="budget" name="budget" defaultValue="">
+          <option value="">Keine Angabe</option>
+          {formOptions.budgets.map((b) => (
+            <option key={b} value={b}>
+              {b}
+            </option>
+          ))}
+        </Select>
+      </Field>
+
+      <Field label="Nachricht" htmlFor="message" required>
+        <textarea
+          id="message"
+          name="message"
+          rows={4}
+          required
+          placeholder="Kurz, worum es geht …"
+          className={inputCls}
+        />
+      </Field>
+    </>
+  );
+}
+
+function PlatformMultiSelect({
+  selected,
+  onChange,
+  error,
+}: {
+  selected: string[];
+  onChange: (next: string[]) => void;
+  error: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const listId = useId();
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  function toggle(platform: string) {
+    onChange(
+      selected.includes(platform)
+        ? selected.filter((p) => p !== platform)
+        : [...selected, platform],
+    );
+  }
+
+  const label =
+    selected.length === 0
+      ? "Plattformen wählen"
+      : selected.length === 1
+        ? selected[0]
+        : `${selected.length} ausgewählt`;
+
+  return (
+    <div ref={rootRef}>
+      <p className="mb-1.5 text-sm font-medium text-ink">
+        Plattform <span className="text-brand">*</span>
+      </p>
+      <p className="mb-2 text-xs text-ink-soft">Mehrfachauswahl möglich</p>
+
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={listId}
+        onClick={() => setOpen((v) => !v)}
+        className={`${inputCls} flex cursor-pointer items-center justify-between text-left ${
+          error ? "border-red-500 focus:border-red-500 focus:ring-red-100" : ""
+        }`}
+      >
+        <span className={selected.length ? "text-ink" : "text-ink-soft"}>
+          {label}
+        </span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          className={`h-4 w-4 shrink-0 text-ink-soft transition-transform ${open ? "rotate-180" : ""}`}
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {open && (
+        <ul
+          id={listId}
+          role="listbox"
+          aria-multiselectable
+          className="mt-2 space-y-1 rounded-theme border border-line bg-page p-2"
+        >
+          {formOptions.platforms.map((platform) => {
+            const active = selected.includes(platform);
+            return (
+              <li key={platform}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => toggle(platform)}
+                  className={`flex w-full items-center gap-3 rounded-theme px-3 py-2.5 text-left text-sm transition-colors ${
+                    active
+                      ? "bg-brand-soft font-semibold text-brand"
+                      : "text-ink hover:bg-surface-alt"
+                  }`}
+                >
+                  <span
+                    className={`flex h-4 w-4 items-center justify-center rounded border ${
+                      active
+                        ? "border-brand bg-brand text-on-brand"
+                        : "border-line bg-surface"
+                    }`}
+                    aria-hidden
+                  >
+                    {active && (
+                      <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3">
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </span>
+                  {platform}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {/* Für FormData / spätere Backend-Anbindung */}
+      {selected.map((p) => (
+        <input key={p} type="hidden" name="platforms" value={p} />
+      ))}
+
+      {error && (
+        <p className="mt-1.5 text-xs text-red-600">
+          Bitte mindestens eine Plattform wählen.
+        </p>
+      )}
+    </div>
+  );
+}
 
 const inputCls =
   "w-full rounded-theme border border-line bg-page px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand-soft";
@@ -310,22 +510,29 @@ function Field({
   label,
   htmlFor,
   children,
+  required,
+  optional,
 }: {
   label: string;
   htmlFor: string;
   children: React.ReactNode;
+  required?: boolean;
+  optional?: boolean;
 }) {
   return (
     <div>
       <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-ink">
         {label}
+        {required && <span className="text-brand"> *</span>}
+        {optional && (
+          <span className="ml-1 text-xs font-normal text-ink-soft">(optional)</span>
+        )}
       </label>
       {children}
     </div>
   );
 }
 
-/* Dropdown mit exakt gleicher Größe/Styling wie die Textfelder. */
 function Select({
   id,
   name,
@@ -356,17 +563,14 @@ function Select({
         aria-hidden="true"
         className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft"
       >
-        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M6 9l6 6 6-6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     </div>
-  );
-}
-
-function CalendarIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.7" />
-      <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
   );
 }

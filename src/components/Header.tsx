@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Logo } from "./Logo";
-import { navItems } from "@/config/site";
-
-const SECTION_IDS = navItems.map((item) => item.href.replace("#", ""));
+import { useAudience } from "@/components/AudienceContext";
+import { ctas, navByAudience } from "@/config/site";
 
 export function Header() {
+  const { audience, setAudience } = useAudience();
+  const navItems = navByAudience[audience];
   const [open, setOpen] = useState(false);
   const [activeHref, setActiveHref] = useState("#start");
+  const primaryCta = audience === "firma" ? ctas.company : ctas.creator;
 
-  // Menü bei Wechsel auf Desktop-Breite schließen
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const onChange = () => mq.matches && setOpen(false);
@@ -18,11 +19,12 @@ export function Header() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Aktive Sektion anhand Scroll-Position markieren
   useEffect(() => {
-    const elements = SECTION_IDS.map((id) => document.getElementById(id)).filter(
-      (el): el is HTMLElement => Boolean(el),
-    );
+    setActiveHref("#start");
+    const ids = navItems.map((item) => item.href.replace("#", ""));
+    const elements = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
     if (elements.length === 0) return;
 
     const observer = new IntersectionObserver(
@@ -42,7 +44,7 @@ export function Header() {
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [navItems]);
 
   function navClass(href: string, mobile = false) {
     const active = activeHref === href;
@@ -56,10 +58,19 @@ export function Header() {
       : "rounded-full px-3 py-2 text-sm font-medium text-ink/70 transition-colors hover:text-ink";
   }
 
+  function goToForm(e: React.MouseEvent) {
+    e.preventDefault();
+    setAudience(audience);
+    setOpen(false);
+    document.getElementById("kontakt")?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  const ctaLabel =
+    audience === "firma" ? ctas.company.shortLabel : ctas.creator.label;
+
   return (
     <header className="header-facet sticky top-0 z-50 border-b border-line">
       <div className="relative mx-auto max-w-6xl px-4">
-        {/* ---------- MOBILE (< md): Name mittig, Burger rechts ---------- */}
         <div className="relative flex h-16 items-center justify-center md:hidden">
           <Logo variant="stacked" className="text-ink" />
 
@@ -79,7 +90,6 @@ export function Header() {
           </button>
         </div>
 
-        {/* ---------- DESKTOP (>= md): Logo links, Nav rechts ---------- */}
         <div className="hidden h-16 items-center justify-between md:flex">
           <Logo variant="inline" className="text-ink" />
           <nav aria-label="Hauptnavigation">
@@ -97,10 +107,11 @@ export function Header() {
               ))}
               <li>
                 <a
-                  href="#kontakt"
+                  href={primaryCta.href}
+                  onClick={goToForm}
                   className="ml-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong"
                 >
-                  Beratung anfragen
+                  {ctaLabel}
                 </a>
               </li>
             </ul>
@@ -108,7 +119,6 @@ export function Header() {
         </div>
       </div>
 
-      {/* ---------- MOBILE Ausklapp-Navigation ---------- */}
       {open && (
         <nav
           id="mobile-nav"
@@ -130,11 +140,11 @@ export function Header() {
             ))}
             <li className="pt-1">
               <a
-                href="#kontakt"
-                onClick={() => setOpen(false)}
+                href={primaryCta.href}
+                onClick={goToForm}
                 className="block rounded-full bg-brand px-4 py-3 text-center text-base font-semibold text-on-brand hover:bg-brand-strong"
               >
-                Beratung anfragen
+                {primaryCta.label}
               </a>
             </li>
           </ul>

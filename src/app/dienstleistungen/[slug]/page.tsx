@@ -34,13 +34,13 @@ export default async function ServiceDetailPage({
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 md:py-24">
       <a
-        href="/#dienstleistungen"
+        href="/#ablauf"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-strong"
       >
         <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
           <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        Alle Dienstleistungen
+        Zum Ablauf
       </a>
 
       <div className="mt-10">
@@ -79,10 +79,10 @@ export default async function ServiceDetailPage({
           passenden Vorschlag.
         </p>
         <a
-          href="/#kontakt"
+          href="/?role=firma#kontakt"
           className="mt-6 inline-flex rounded-theme bg-on-brand px-6 py-3 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft"
         >
-          Kontakt aufnehmen
+          Kostenloses Erstgespräch vereinbaren
         </a>
       </div>
 

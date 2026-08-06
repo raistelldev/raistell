@@ -1,35 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { IntroSplash } from "@/components/IntroSplash";
+import { useAudience } from "@/components/AudienceContext";
 import { Hero } from "@/components/sections/Hero";
-import { Services } from "@/components/sections/Services";
-import { About } from "@/components/sections/About";
+import { CompanyFunnel } from "@/components/funnels/CompanyFunnel";
+import { CreatorFunnel } from "@/components/funnels/CreatorFunnel";
 import { Contact } from "@/components/sections/Contact";
 
 /*
-  One-Page mit Intro bei jedem Aufruf.
-  Schachbrett: Start (INK) → Dienstleistungen (Mist) → Kontakt (INK) → Über uns (Warm White).
+  Zwei getrennte Funnel – Umschalter im Hero:
+  Unternehmen → Schritt für Schritt zum Erstgespräch
+  Creator → Schritt für Schritt zum Netzwerk
 */
 export default function Home() {
-  const [entered, setEntered] = useState(false);
+  const { audience } = useAudience();
 
   return (
-    <>
-      {!entered && <IntroSplash onEnter={() => setEntered(true)} />}
-      <main
-        className={
-          entered
-            ? "opacity-100 transition-opacity duration-500"
-            : "pointer-events-none opacity-0"
-        }
-        aria-hidden={!entered}
-      >
-        <Hero />
-        <Services />
-        <Contact />
-        <About />
-      </main>
-    </>
+    <main>
+      <Hero />
+      {audience === "firma" ? <CompanyFunnel /> : <CreatorFunnel />}
+      <Contact />
+    </main>
   );
 }

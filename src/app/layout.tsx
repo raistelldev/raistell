@@ -4,10 +4,9 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CookieBanner } from "@/components/CookieBanner";
-import { site } from "@/config/site";
+import { AudienceProvider } from "@/components/AudienceContext";
+import { companyFunnel, site } from "@/config/site";
 
-// EINE Schriftfamilie mit klaren Rollen (Inter):
-// Semibold für Headlines/Zahlen, Regular für Fließtext.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -15,8 +14,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: `${site.name} – Influencer & erneuerbare Energie`,
-  description: site.subclaim,
+  title: `${site.name} – Authentische Creator für die Energiewende`,
+  description: companyFunnel.hero.subtitle,
 };
 
 export default function RootLayout({
@@ -30,10 +29,12 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <Header />
-        <div className="flex-1">{children}</div>
-        <Footer />
-        <CookieBanner />
+        <AudienceProvider>
+          <Header />
+          <div className="flex-1">{children}</div>
+          <Footer />
+          <CookieBanner />
+        </AudienceProvider>
       </body>
     </html>
   );
