@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ctas, site } from "@/config/site";
@@ -9,35 +9,105 @@ type Role = "creator" | "firma";
 
 const copy: Record<
   Role,
-  { title: string; body: string; next: string }
+  { title: string; body: string; next: string; calendlyHint: string }
 > = {
   firma: {
     title: "Danke – wir melden uns bei Ihnen.",
-    body: "Ihre Anfrage ist bei uns angekommen. Wir prüfen kurz, was passt, und melden uns persönlich für Ihr kostenloses Erstgespräch.",
-    next: "In der Zwischenzeit können Sie gerne noch einmal unseren Ablauf ansehen.",
+    body: "Ihre Anfrage ist bei uns angekommen. Wählen Sie jetzt einen Termin für Ihr kostenloses Erstgespräch.",
+    next: "Nach der Buchung erhalten Sie eine Bestätigung inkl. Google-Meet-Link.",
+    calendlyHint: "Termin für Ihr Erstgespräch wählen",
   },
   creator: {
     title: "Schön, dass du dabei sein willst.",
-    body: "Deine Anfrage ist angekommen. Wir schauen uns dein Profil in Ruhe an und melden uns, wenn es passt – ohne Massenmails, ohne Druck.",
-    next: "Bis dahin: einfach weiter machen, was deinen Content ausmacht.",
+    body: "Deine Anfrage ist angekommen. Wähle jetzt einen Termin, damit wir dich kennenlernen können.",
+    next: "Nach der Buchung erhältst du eine Bestätigung inkl. Google-Meet-Link.",
+    calendlyHint: "Termin zum Kennenlernen wählen",
   },
 };
+
+declare global {
+  interface Window {
+    Calendly?: {
+      initInlineWidget: (options: {
+        url: string;
+        parentElement: HTMLElement;
+        prefill?: { name?: string; email?: string };
+      }) => void;
+    };
+  }
+}
 
 export function ThankYouContent() {
   const params = useSearchParams();
   const roleParam = params.get("role");
   const role: Role = roleParam === "creator" ? "creator" : "firma";
   const text = copy[role];
+  const name = params.get("name")?.trim() ?? "";
+  const email = params.get("email")?.trim() ?? "";
+  const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL?.trim() ?? "";
   const [visible, setVisible] = useState(false);
+
+  const widgetUrl = useMemo(() => {
+    if (!calendlyUrl) return "";
+    const url = new URL(calendlyUrl);
+    url.searchParams.set("hide_gdpr_banner", "1");
+    return url.toString();
+  }, [calendlyUrl]);
 
   useEffect(() => {
     const t = window.setTimeout(() => setVisible(true), 40);
     return () => window.clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    if (!widgetUrl) return;
+
+    const parent = document.getElementById("calendly-embed");
+    if (!parent) return;
+
+    parent.innerHTML = "";
+
+    function mount() {
+      if (!parent || !window.Calendly) return;
+      window.Calendly.initInlineWidget({
+        url: widgetUrl,
+        parentElement: parent,
+        prefill: {
+          ...(name ? { name } : {}),
+          ...(email ? { email } : {}),
+        },
+      });
+    }
+
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[data-calendly="true"]',
+    );
+
+    if (window.Calendly) {
+      mount();
+      return;
+    }
+
+    const script =
+      existing ??
+      Object.assign(document.createElement("script"), {
+        src: "https://assets.calendly.com/assets/external/widget.js",
+        async: true,
+      });
+    script.dataset.calendly = "true";
+    script.onload = mount;
+
+    if (!existing) {
+      document.body.appendChild(script);
+    }
+
+    return () => {
+      script.onload = null;
+    };
+  }, [widgetUrl, name, email]);
+
   return (
     <main className="relative flex flex-1 flex-col overflow-hidden bg-dark">
-      {/* Ruhiger Glow – Markenfarben, keine Purple-AI-Optik */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
@@ -48,7 +118,7 @@ export function ThankYouContent() {
       />
 
       <div
-        className={`relative mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-4 py-20 text-center transition-all duration-700 ease-out sm:py-28 ${
+        className={`relative mx-auto flex w-full max-w-3xl flex-1 flex-col items-center px-4 py-20 text-center transition-all duration-700 ease-out sm:py-28 ${
           visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >
@@ -85,6 +155,29 @@ export function ThankYouContent() {
         <p className="mt-4 max-w-md text-sm leading-relaxed text-on-dark/65">
           {text.next}
         </p>
+
+        {widgetUrl ? (
+          <div className="mt-12 w-full text-left">
+            <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest text-brand">
+              {text.calendlyHint}
+            </p>
+            <div
+              id="calendly-embed"
+              className="min-h-[700px] w-full overflow-hidden rounded-theme border border-line/30 bg-surface"
+            />
+          </div>
+        ) : (
+          <p className="mt-10 max-w-md text-sm text-on-dark/65">
+            Terminbuchung ist noch nicht konfiguriert. Bitte schreiben Sie an{" "}
+            <a
+              href={`mailto:${site.contact.email}`}
+              className="text-brand underline hover:text-brand-soft"
+            >
+              {site.contact.email}
+            </a>
+            .
+          </p>
+        )}
 
         <div className="mt-10 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
           <Link

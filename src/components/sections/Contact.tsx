@@ -8,24 +8,81 @@ import { ctas, formOptions, site } from "@/config/site";
 
 export function Contact() {
   const router = useRouter();
-  const { audience, setAudience } = useAudience();
+  const { audience } = useAudience();
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [platformError, setPlatformError] = useState(false);
   const [seeking, setSeeking] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     setPlatforms([]);
     setPlatformError(false);
     setSeeking([]);
+    setSubmitError(null);
   }, [audience]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitError(null);
+
     if (audience === "creator" && platforms.length === 0) {
       setPlatformError(true);
       return;
     }
-    router.push(`/danke?role=${audience}`);
+
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const data: Record<string, unknown> = { role: audience };
+
+    for (const [key, value] of fd.entries()) {
+      if (typeof value !== "string") continue;
+      if (key === "platforms" || key === "seeking") continue;
+      data[key] = value;
+    }
+
+    if (audience === "creator") {
+      data.platforms = platforms;
+    } else {
+      data.seeking = seeking;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        name?: string;
+        email?: string;
+        role?: string;
+      };
+
+      if (!res.ok || !result.ok) {
+        setSubmitError(
+          result.error ?? "Senden fehlgeschlagen. Bitte erneut versuchen.",
+        );
+        return;
+      }
+
+      const params = new URLSearchParams({
+        role: result.role ?? audience,
+        name: result.name ?? "",
+        email: result.email ?? "",
+      });
+      router.push(`/danke?${params.toString()}`);
+    } catch {
+      setSubmitError(
+        "Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const submitLabel =
@@ -52,27 +109,6 @@ export function Contact() {
         center
         onDark
       />
-
-      <div className="mt-8 flex justify-center">
-        <div
-          role="tablist"
-          aria-label="Ich bin"
-          className="inline-flex rounded-full border border-line bg-surface p-1"
-        >
-          <ToggleButton
-            active={audience === "firma"}
-            onClick={() => setAudience("firma")}
-          >
-            Unternehmen
-          </ToggleButton>
-          <ToggleButton
-            active={audience === "creator"}
-            onClick={() => setAudience("creator")}
-          >
-            Creator
-          </ToggleButton>
-        </div>
-      </div>
 
       <div className="mx-auto mt-10 max-w-2xl rounded-theme border border-line bg-surface p-6 sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-4" key={audience}>
@@ -105,10 +141,16 @@ export function Contact() {
 
           <button
             type="submit"
-            className="w-full rounded-theme bg-brand px-6 py-3.5 text-base font-semibold text-on-brand transition-colors hover:bg-brand-strong"
+            disabled={submitting}
+            className="w-full rounded-theme bg-brand px-6 py-3.5 text-base font-semibold text-on-brand transition-colors hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {submitLabel}
+            {submitting ? "Wird gesendet …" : submitLabel}
           </button>
+          {submitError && (
+            <p className="text-center text-sm text-red-600" role="alert">
+              {submitError}
+            </p>
+          )}
           <p className="text-center text-xs text-ink-soft">
             Fragen?{" "}
             <a
@@ -513,30 +555,6 @@ function MultiSelect({
 
 const inputCls =
   "w-full rounded-theme border border-line bg-page px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand-soft";
-
-function ToggleButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors sm:px-5 ${
-        active ? "bg-brand text-on-brand" : "text-ink-soft hover:text-ink"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
 
 function Field({
   label,
