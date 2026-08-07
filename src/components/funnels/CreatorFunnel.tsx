@@ -67,6 +67,9 @@ export function CreatorFunnel() {
               <h3 className="mt-4 font-brand text-xl font-semibold text-ink">
                 {step.title}
               </h3>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                {step.text}
+              </p>
             </li>
           ))}
         </ol>

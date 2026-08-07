@@ -152,10 +152,26 @@ export const companyFunnel = {
   process: {
     title: "In vier einfachen Schritten zur Creator-Kooperation.",
     steps: [
-      { n: "01", title: "Erstgespräch" },
-      { n: "02", title: "Creator Matching" },
-      { n: "03", title: "Content-Produktion" },
-      { n: "04", title: "Veröffentlichung" },
+      {
+        n: "01",
+        title: "Erstgespräch",
+        text: "Wir lernen Ihr Unternehmen, Ihre Ziele und Ihr Projekt kennen.",
+      },
+      {
+        n: "02",
+        title: "Creator Matching",
+        text: "Wir wählen einen passenden Creator aus unserem Netzwerk aus.",
+      },
+      {
+        n: "03",
+        title: "Content-Produktion",
+        text: "Wir koordinieren Briefing, Abstimmung und Produktion bis zur Freigabe.",
+      },
+      {
+        n: "04",
+        title: "Veröffentlichung",
+        text: "Der Content geht live und Sie erhalten die vereinbarten Ergebnisse.",
+      },
     ],
   },
   trust: {
@@ -271,12 +287,36 @@ export const creatorFunnel = {
     eyebrow: "So wirst du Teil unseres Netzwerks",
     title: "Von der Bewerbung bis zur Auszahlung.",
     steps: [
-      { n: "01", title: "Bewerbung" },
-      { n: "02", title: "Kennenlernen" },
-      { n: "03", title: "Aufnahme ins Netzwerk" },
-      { n: "04", title: "Passende Projekte erhalten" },
-      { n: "05", title: "Content produzieren" },
-      { n: "06", title: "Auszahlung" },
+      {
+        n: "01",
+        title: "Bewerbung",
+        text: "Bewirb dich mit deinem Profil und deinen Kanälen.",
+      },
+      {
+        n: "02",
+        title: "Kennenlernen",
+        text: "Wir prüfen, ob dein Content zu unserem Netzwerk passt.",
+      },
+      {
+        n: "03",
+        title: "Aufnahme",
+        text: "Nach erfolgreichem Gespräch wirst du Teil des Netzwerks.",
+      },
+      {
+        n: "04",
+        title: "Projekte",
+        text: "Wir vermitteln passende Kooperationen.",
+      },
+      {
+        n: "05",
+        title: "Produktion",
+        text: "Du produzierst den Content nach dem Briefing.",
+      },
+      {
+        n: "06",
+        title: "Auszahlung",
+        text: "Nach erfolgreichem Projekt erhältst du deine Vergütung.",
+      },
     ],
   },
   seeking: {
