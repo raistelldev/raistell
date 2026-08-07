@@ -70,10 +70,10 @@ export const navItems = navByAudience.firma;
 export const formOptions = {
   platforms: ["Instagram", "YouTube", "TikTok", "LinkedIn", "Andere"] as const,
   followerRanges: [
-    "unter 10 Tsd.",
-    "10–50 Tsd.",
-    "50–250 Tsd.",
-    "über 250 Tsd.",
+    "unter 10.000",
+    "10.000–50.000",
+    "50.000–100.000",
+    "über 100.000",
   ] as const,
   bundeslaender: [
     "Baden-Württemberg",
@@ -95,11 +95,10 @@ export const formOptions = {
     "Außerhalb Deutschlands",
   ] as const,
   seeking: [
-    "Sponsoring",
-    "Projekt-Content",
-    "Vertrauensformat",
-    "Partnerschaft",
-    "Noch offen / Beratung",
+    "Einmalige Creator-Kooperation",
+    "Langfristige Creator-Zusammenarbeit",
+    "Projektbegleitung mit Content",
+    "Ich bin noch unsicher / Beratung",
   ] as const,
   budgets: [
     "noch offen",
@@ -151,8 +150,7 @@ export const companyFunnel = {
     ],
   },
   process: {
-    eyebrow: "So läuft es ab",
-    title: "Von der Anfrage bis zur Veröffentlichung.",
+    title: "In vier einfachen Schritten zur Creator-Kooperation.",
     steps: [
       { n: "01", title: "Erstgespräch" },
       { n: "02", title: "Creator Matching" },
@@ -270,8 +268,8 @@ export const creatorFunnel = {
     ],
   },
   process: {
-    eyebrow: "So läuft die Zusammenarbeit",
-    title: "Klarer Ablauf. Mehr Sicherheit.",
+    eyebrow: "So wirst du Teil unseres Netzwerks",
+    title: "Von der Bewerbung bis zur Auszahlung.",
     steps: [
       { n: "01", title: "Bewerbung" },
       { n: "02", title: "Kennenlernen" },

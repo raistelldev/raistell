@@ -80,7 +80,7 @@ export function CompanyFunnel() {
 
       {/* Ablauf */}
       <Section id="ablauf" tone="alt">
-        <SectionHeading eyebrow={f.process.eyebrow} title={f.process.title} />
+        <SectionHeading title={f.process.title} />
         <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {f.process.steps.map((step) => (
             <li key={step.n} className="border-t border-line pt-5">

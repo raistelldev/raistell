@@ -11,10 +11,12 @@ export function Contact() {
   const { audience, setAudience } = useAudience();
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [platformError, setPlatformError] = useState(false);
+  const [seeking, setSeeking] = useState<string[]>([]);
 
   useEffect(() => {
     setPlatforms([]);
     setPlatformError(false);
+    setSeeking([]);
   }, [audience]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -84,7 +86,7 @@ export function Contact() {
               platformError={platformError}
             />
           ) : (
-            <CompanyFields />
+            <CompanyFields seeking={seeking} setSeeking={setSeeking} />
           )}
 
           <label className="flex items-start gap-2 pt-2 text-xs text-ink-soft">
@@ -161,16 +163,23 @@ function CreatorFields({
             name="region"
             type="text"
             required
-            placeholder="z. B. Bayern / DACH"
+            placeholder="z. B. München, Bayern / DACH"
             className={inputCls}
           />
         </Field>
       </div>
 
-      <PlatformMultiSelect
+      <MultiSelect
+        label="Plattform"
+        hint="Mehrfachauswahl möglich"
+        name="platforms"
+        options={formOptions.platforms}
         selected={platforms}
         onChange={setPlatforms}
+        required
         error={platformError}
+        errorMessage="Bitte mindestens eine Plattform wählen."
+        placeholder="Plattformen wählen"
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -242,7 +251,13 @@ function CreatorFields({
   );
 }
 
-function CompanyFields() {
+function CompanyFields({
+  seeking,
+  setSeeking,
+}: {
+  seeking: string[];
+  setSeeking: (next: string[]) => void;
+}) {
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -306,18 +321,16 @@ function CompanyFields() {
         </Field>
       </div>
 
-      <Field label="Was wird gesucht?" htmlFor="seeking" required>
-        <Select id="seeking" name="seeking" required defaultValue="">
-          <option value="" disabled>
-            Bitte wählen
-          </option>
-          {formOptions.seeking.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </Select>
-      </Field>
+      <MultiSelect
+        label="Welche Art der Zusammenarbeit suchen Sie?"
+        hint="Mehrfachauswahl möglich"
+        name="seeking"
+        options={formOptions.seeking}
+        selected={seeking}
+        onChange={setSeeking}
+        optional
+        placeholder="Bitte wählen"
+      />
 
       <Field label="Budget" htmlFor="budget" optional>
         <Select id="budget" name="budget" defaultValue="">
@@ -344,14 +357,30 @@ function CompanyFields() {
   );
 }
 
-function PlatformMultiSelect({
+function MultiSelect({
+  label,
+  hint,
+  name,
+  options,
   selected,
   onChange,
+  required,
+  optional,
   error,
+  errorMessage,
+  placeholder,
 }: {
+  label: string;
+  hint?: string;
+  name: string;
+  options: readonly string[];
   selected: string[];
   onChange: (next: string[]) => void;
-  error: boolean;
+  required?: boolean;
+  optional?: boolean;
+  error?: boolean;
+  errorMessage?: string;
+  placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -365,39 +394,45 @@ function PlatformMultiSelect({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  function toggle(platform: string) {
+  function toggle(option: string) {
     onChange(
-      selected.includes(platform)
-        ? selected.filter((p) => p !== platform)
-        : [...selected, platform],
+      selected.includes(option)
+        ? selected.filter((o) => o !== option)
+        : [...selected, option],
     );
   }
 
-  const label =
-    selected.length === 0
-      ? "Plattformen wählen"
-      : selected.length === 1
-        ? selected[0]
-        : `${selected.length} ausgewählt`;
+  const summary =
+    selected.length === 0 ? placeholder : selected.join(", ");
 
   return (
     <div ref={rootRef}>
       <p className="mb-1.5 text-sm font-medium text-ink">
-        Plattform <span className="text-brand">*</span>
+        {label}
+        {required && <span className="text-brand"> *</span>}
+        {optional && (
+          <span className="ml-1 text-xs font-normal text-ink-soft">
+            (optional)
+          </span>
+        )}
       </p>
-      <p className="mb-2 text-xs text-ink-soft">Mehrfachauswahl möglich</p>
+      {hint && <p className="mb-2 text-xs text-ink-soft">{hint}</p>}
 
       <button
         type="button"
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((v) => !v)}
-        className={`${inputCls} flex cursor-pointer items-center justify-between text-left ${
+        className={`${inputCls} flex cursor-pointer items-center justify-between gap-3 text-left ${
           error ? "border-red-500 focus:border-red-500 focus:ring-red-100" : ""
         }`}
       >
-        <span className={selected.length ? "text-ink" : "text-ink-soft"}>
-          {label}
+        <span
+          className={`min-w-0 flex-1 ${
+            selected.length ? "text-ink" : "text-ink-soft"
+          }`}
+        >
+          {summary}
         </span>
         <svg
           viewBox="0 0 24 24"
@@ -422,15 +457,15 @@ function PlatformMultiSelect({
           aria-multiselectable
           className="mt-2 space-y-1 rounded-theme border border-line bg-page p-2"
         >
-          {formOptions.platforms.map((platform) => {
-            const active = selected.includes(platform);
+          {options.map((option) => {
+            const active = selected.includes(option);
             return (
-              <li key={platform}>
+              <li key={option}>
                 <button
                   type="button"
                   role="option"
                   aria-selected={active}
-                  onClick={() => toggle(platform)}
+                  onClick={() => toggle(option)}
                   className={`flex w-full items-center gap-3 rounded-theme px-3 py-2.5 text-left text-sm transition-colors ${
                     active
                       ? "bg-brand-soft font-semibold text-brand"
@@ -438,7 +473,7 @@ function PlatformMultiSelect({
                   }`}
                 >
                   <span
-                    className={`flex h-4 w-4 items-center justify-center rounded border ${
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
                       active
                         ? "border-brand bg-brand text-on-brand"
                         : "border-line bg-surface"
@@ -457,7 +492,7 @@ function PlatformMultiSelect({
                       </svg>
                     )}
                   </span>
-                  {platform}
+                  {option}
                 </button>
               </li>
             );
@@ -465,15 +500,12 @@ function PlatformMultiSelect({
         </ul>
       )}
 
-      {/* Für FormData / spätere Backend-Anbindung */}
-      {selected.map((p) => (
-        <input key={p} type="hidden" name="platforms" value={p} />
+      {selected.map((value) => (
+        <input key={value} type="hidden" name={name} value={value} />
       ))}
 
-      {error && (
-        <p className="mt-1.5 text-xs text-red-600">
-          Bitte mindestens eine Plattform wählen.
-        </p>
+      {error && errorMessage && (
+        <p className="mt-1.5 text-xs text-red-600">{errorMessage}</p>
       )}
     </div>
   );
