@@ -1,6 +1,6 @@
 import { Section, SectionHeading } from "@/components/Section";
 import { Faq } from "@/components/sections/Faq";
-import { companyFunnel, ctas } from "@/config/site";
+import { companyFunnel } from "@/config/site";
 
 function CheckIcon({ className = "" }: { className?: string }) {
   return (
@@ -66,13 +66,19 @@ export function CompanyFunnel() {
           eyebrow={f.whyRaistell.eyebrow}
           title={f.whyRaistell.title}
         />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-12 max-w-2xl space-y-5">
           {f.whyRaistell.points.map((point, i) => (
-            <li key={point} className="border-t border-line pt-5">
+            <li
+              key={point}
+              className="border-t border-line pt-5 transition-[margin] duration-500"
+              style={{ marginLeft: `min(${i * 1.75}rem, ${i * 8}%)` }}
+            >
               <span className="font-brand text-sm font-semibold tracking-widest text-brand">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <p className="mt-3 font-brand text-lg font-semibold text-ink">{point}</p>
+              <p className="mt-3 font-brand text-lg font-semibold text-ink sm:text-xl">
+                {point}
+              </p>
             </li>
           ))}
         </ul>
@@ -129,11 +135,8 @@ export function CompanyFunnel() {
           </h3>
           <div className="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
             {f.founding.name.parts.map((part) => (
-              <div key={part.n} className="border-t border-on-dark/20 pt-6">
-                <span className="font-brand text-sm font-semibold tracking-widest text-on-dark/75">
-                  {part.n}
-                </span>
-                <h4 className="mt-5 font-brand text-xl font-semibold text-on-dark">
+              <div key={part.title} className="border-t border-on-dark/20 pt-6">
+                <h4 className="font-brand text-xl font-semibold text-on-dark">
                   {part.title}
                 </h4>
                 <p className="mt-3 text-sm leading-relaxed text-on-dark/80">
@@ -154,21 +157,6 @@ export function CompanyFunnel() {
         items={f.faq.items}
         tone="light"
       />
-
-      {/* Closing CTA → Formular */}
-      <section id="abschluss" className="scroll-mt-16 bg-surface-alt">
-        <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
-          <h2 className="font-brand text-2xl font-semibold tracking-tight text-ink sm:text-3xl md:text-4xl">
-            {f.closing.title}
-          </h2>
-          <a
-            href="#kontakt"
-            className="mt-8 inline-flex w-full items-center justify-center rounded-theme bg-brand px-6 py-3.5 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong sm:w-auto"
-          >
-            {ctas.company.label}
-          </a>
-        </div>
-      </section>
     </>
   );
 }

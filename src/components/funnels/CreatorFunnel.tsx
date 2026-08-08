@@ -1,6 +1,6 @@
 import { Section, SectionHeading } from "@/components/Section";
 import { Faq } from "@/components/sections/Faq";
-import { creatorFunnel, ctas } from "@/config/site";
+import { creatorFunnel } from "@/config/site";
 
 function CheckIcon({ className = "" }: { className?: string }) {
   return (
@@ -93,23 +93,6 @@ export function CreatorFunnel() {
         items={f.faq.items}
         tone="alt"
       />
-
-      <section id="abschluss" className="scroll-mt-16 bg-dark">
-        <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
-          <h2 className="font-brand text-2xl font-semibold tracking-tight text-on-dark sm:text-3xl md:text-4xl">
-            {f.closing.title}
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-base text-on-dark/80">
-            {f.closing.text}
-          </p>
-          <a
-            href="#kontakt"
-            className="mt-8 inline-flex w-full items-center justify-center rounded-theme bg-on-dark px-6 py-3.5 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft sm:w-auto"
-          >
-            {ctas.creator.finalLabel}
-          </a>
-        </div>
-      </section>
     </>
   );
 }
