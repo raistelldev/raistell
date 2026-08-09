@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ctas, site } from "@/config/site";
@@ -8,7 +8,9 @@ import { ctas, site } from "@/config/site";
 type Role = "creator" | "firma";
 
 const CALENDLY_HEIGHT = 750;
-const READY_FALLBACK_MS = 12_000;
+/** Same for both roles – only Calendly “ready” or this fallback clears the buffer */
+const READY_FALLBACK_MS = 10_000;
+const MIN_BUFFER_MS = 500;
 
 const copy: Record<
   Role,
@@ -33,11 +35,7 @@ function buildCalendlyEmbedUrl(
   prefill: { name?: string; email?: string },
 ) {
   const url = new URL(baseUrl);
-  url.searchParams.set("embed_type", "Inline");
   url.searchParams.set("hide_gdpr_banner", "1");
-  if (typeof window !== "undefined") {
-    url.searchParams.set("embed_domain", window.location.hostname);
-  }
   if (prefill.name) url.searchParams.set("name", prefill.name);
   if (prefill.email) url.searchParams.set("email", prefill.email);
   return url.toString();
@@ -47,13 +45,51 @@ function isCalendlyReadyMessage(data: unknown) {
   if (!data || typeof data !== "object") return false;
   const event = (data as { event?: unknown }).event;
   if (typeof event !== "string" || !event.startsWith("calendly.")) return false;
+  // Same signals for event-type and profile embeds
   return (
     event === "calendly.event_type_viewed" ||
     event === "calendly.profile_page_viewed" ||
-    event === "calendly.date_and_time_selected" ||
-    event === "calendly.event_scheduled" ||
     event === "calendly.page_height"
   );
+}
+
+declare global {
+  interface Window {
+    Calendly?: {
+      initInlineWidget: (opts: {
+        url: string;
+        parentElement: HTMLElement;
+        prefill?: { name?: string; email?: string };
+      }) => void;
+    };
+  }
+}
+
+function loadCalendlyScript() {
+  const existing = document.querySelector<HTMLScriptElement>(
+    'script[data-calendly-widget="1"]',
+  );
+  if (existing) {
+    return existing.dataset.loaded === "1"
+      ? Promise.resolve()
+      : new Promise<void>((resolve, reject) => {
+          existing.addEventListener("load", () => resolve(), { once: true });
+          existing.addEventListener("error", () => reject(), { once: true });
+        });
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    script.dataset.calendlyWidget = "1";
+    script.onload = () => {
+      script.dataset.loaded = "1";
+      resolve();
+    };
+    script.onerror = () => reject(new Error("Calendly script failed"));
+    document.body.appendChild(script);
+  });
 }
 
 export function ThankYouContent() {
@@ -68,9 +104,13 @@ export function ThankYouContent() {
       ? process.env.NEXT_PUBLIC_CALENDLY_URL_CREATOR
       : process.env.NEXT_PUBLIC_CALENDLY_URL_FIRMA
     )?.trim() ?? "";
+
   const [visible, setVisible] = useState(false);
-  const [iframeSrc, setIframeSrc] = useState("");
   const [calendarReady, setCalendarReady] = useState(false);
+  const [embedFailed, setEmbedFailed] = useState(false);
+  const widgetParentRef = useRef<HTMLDivElement>(null);
+  const mountedAtRef = useRef(0);
+  const readyLockRef = useRef(false);
 
   const openUrl = useMemo(() => {
     if (!calendlyUrl) return "";
@@ -84,32 +124,74 @@ export function ThankYouContent() {
     }
   }, [calendlyUrl, name, email]);
 
+  const embedUrl = useMemo(() => {
+    if (!calendlyUrl) return "";
+    try {
+      return buildCalendlyEmbedUrl(calendlyUrl, {
+        ...(name ? { name } : {}),
+        ...(email ? { email } : {}),
+      });
+    } catch {
+      return "";
+    }
+  }, [calendlyUrl, name, email]);
+
+  function markReady() {
+    if (readyLockRef.current) return;
+    const elapsed = Date.now() - mountedAtRef.current;
+    const wait = Math.max(0, MIN_BUFFER_MS - elapsed);
+    window.setTimeout(() => {
+      if (readyLockRef.current) return;
+      readyLockRef.current = true;
+      setCalendarReady(true);
+    }, wait);
+  }
+
   useEffect(() => {
     const t = window.setTimeout(() => setVisible(true), 40);
     return () => window.clearTimeout(t);
   }, []);
 
+  // Official Calendly widget – same init path for firma & creator
   useEffect(() => {
-    if (!calendlyUrl) {
-      setIframeSrc("");
-      return;
-    }
-    try {
-      setCalendarReady(false);
-      setIframeSrc(
-        buildCalendlyEmbedUrl(calendlyUrl, {
-          ...(name ? { name } : {}),
-          ...(email ? { email } : {}),
-        }),
-      );
-    } catch {
-      setIframeSrc("");
-    }
-  }, [calendlyUrl, name, email]);
+    if (!embedUrl || !widgetParentRef.current) return;
 
-  // Mark ready when Calendly posts a real UI event (best signal)
+    let cancelled = false;
+    readyLockRef.current = false;
+    mountedAtRef.current = Date.now();
+    setCalendarReady(false);
+    setEmbedFailed(false);
+    widgetParentRef.current.innerHTML = "";
+
+    void (async () => {
+      try {
+        await loadCalendlyScript();
+        if (cancelled || !widgetParentRef.current || !window.Calendly) return;
+        window.Calendly.initInlineWidget({
+          url: embedUrl,
+          parentElement: widgetParentRef.current,
+          prefill: {
+            ...(name ? { name } : {}),
+            ...(email ? { email } : {}),
+          },
+        });
+      } catch {
+        if (!cancelled) {
+          setEmbedFailed(true);
+          markReady();
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- markReady is stable enough via refs
+  }, [embedUrl, name, email, role]);
+
+  // Identical ready signal for both roles
   useEffect(() => {
-    if (!iframeSrc || calendarReady) return;
+    if (!embedUrl || calendarReady) return;
 
     function onMessage(e: MessageEvent) {
       if (
@@ -118,27 +200,18 @@ export function ThankYouContent() {
       ) {
         return;
       }
-      if (isCalendlyReadyMessage(e.data)) {
-        setCalendarReady(true);
-      }
+      if (isCalendlyReadyMessage(e.data)) markReady();
     }
 
     window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [iframeSrc, calendarReady]);
+    const fallback = window.setTimeout(() => markReady(), READY_FALLBACK_MS);
 
-  // Safety net if Calendly never posts
-  useEffect(() => {
-    if (!iframeSrc || calendarReady) return;
-    const t = window.setTimeout(() => setCalendarReady(true), READY_FALLBACK_MS);
-    return () => window.clearTimeout(t);
-  }, [iframeSrc, calendarReady]);
-
-  function handleIframeLoad() {
-    // iframe shell loaded; wait briefly for Calendly paint, then reveal
-    // (postMessage may already have fired — then this is a no-op)
-    window.setTimeout(() => setCalendarReady(true), 1800);
-  }
+    return () => {
+      window.removeEventListener("message", onMessage);
+      window.clearTimeout(fallback);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [embedUrl, role, calendarReady]);
 
   return (
     <main className="relative flex flex-1 flex-col bg-dark">
@@ -190,7 +263,7 @@ export function ThankYouContent() {
           {text.next}
         </p>
 
-        {iframeSrc ? (
+        {embedUrl ? (
           <div className="mt-12 w-full text-left">
             <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest text-brand">
               {text.calendlyHint}
@@ -200,7 +273,6 @@ export function ThankYouContent() {
               className="relative overflow-hidden rounded-theme border border-line/30 bg-surface"
               style={{ minHeight: CALENDLY_HEIGHT }}
             >
-              {/* Solid buffer occupying the Calendly slot */}
               <div
                 className={`absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-surface px-6 transition-opacity duration-500 ease-out ${
                   calendarReady
@@ -233,14 +305,13 @@ export function ThankYouContent() {
                       />
                     ))}
                   </div>
-                  <div className="h-3 w-2/3 animate-pulse rounded-full bg-brand-soft/40" />
+                  <div className="h-3 w-[66%] animate-pulse rounded-full bg-brand-soft/40" />
                 </div>
               </div>
 
-              <iframe
-                title="Calendly Terminbuchung"
-                src={iframeSrc}
-                className={`block w-full border-0 transition-opacity duration-500 ease-out ${
+              <div
+                ref={widgetParentRef}
+                className={`calendly-inline-widget transition-opacity duration-500 ease-out ${
                   calendarReady ? "opacity-100" : "opacity-0"
                 }`}
                 style={{
@@ -248,12 +319,13 @@ export function ThankYouContent() {
                   height: CALENDLY_HEIGHT,
                   visibility: calendarReady ? "visible" : "hidden",
                 }}
-                onLoad={handleIframeLoad}
               />
             </div>
 
             <p className="mt-3 text-center text-xs text-on-dark/60">
-              Kalender leer?{" "}
+              {embedFailed
+                ? "Kalender konnte nicht eingebettet werden. "
+                : "Kalender leer? "}
               <a
                 href={openUrl || calendlyUrl}
                 target="_blank"
