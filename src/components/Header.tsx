@@ -6,6 +6,11 @@ import { Logo } from "./Logo";
 import { useAudience } from "@/components/AudienceContext";
 import { ctas, navByAudience } from "@/config/site";
 
+function sectionHref(hash: string, isHome: boolean) {
+  if (!hash.startsWith("#")) return hash;
+  return isHome ? hash : `/${hash}`;
+}
+
 export function Header() {
   const pathname = usePathname();
   const { audience, setAudience } = useAudience();
@@ -14,6 +19,7 @@ export function Header() {
   const [activeHref, setActiveHref] = useState("#start");
   const primaryCta = audience === "firma" ? ctas.company : ctas.creator;
   const isAdmin = pathname?.startsWith("/admin") ?? false;
+  const isHome = pathname === "/";
 
   useEffect(() => {
     if (isAdmin) return;
@@ -24,7 +30,10 @@ export function Header() {
   }, [isAdmin]);
 
   useEffect(() => {
-    if (isAdmin) return;
+    if (isAdmin || !isHome) {
+      setActiveHref("");
+      return;
+    }
     setActiveHref("#start");
     const ids = navItems.map((item) => item.href.replace("#", ""));
     const elements = ids
@@ -49,10 +58,10 @@ export function Header() {
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [navItems, isAdmin]);
+  }, [navItems, isAdmin, isHome]);
 
   function navClass(href: string, mobile = false) {
-    const active = activeHref === href;
+    const active = isHome && activeHref === href;
     if (mobile) {
       return active
         ? "block rounded-theme px-3 py-3 text-base font-semibold text-brand"
@@ -63,11 +72,33 @@ export function Header() {
       : "rounded-full px-3 py-2 text-sm font-medium text-ink/70 transition-colors hover:text-ink";
   }
 
+  function onSectionClick(
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) {
+    if (!isHome || !href.startsWith("#")) {
+      setOpen(false);
+      return;
+    }
+    e.preventDefault();
+    setOpen(false);
+    document.getElementById(href.slice(1))?.scrollIntoView({
+      behavior: "smooth",
+    });
+    window.history.replaceState(null, "", href);
+  }
+
   function goToForm(e: React.MouseEvent) {
     e.preventDefault();
     setAudience(audience);
     setOpen(false);
-    document.getElementById("kontakt")?.scrollIntoView({ behavior: "smooth" });
+    if (isHome) {
+      document.getElementById("kontakt")?.scrollIntoView({
+        behavior: "smooth",
+      });
+      return;
+    }
+    window.location.assign(primaryCta.href);
   }
 
   const ctaLabel =
@@ -104,8 +135,11 @@ export function Header() {
               {navItems.map((item) => (
                 <li key={item.href}>
                   <a
-                    href={item.href}
-                    aria-current={activeHref === item.href ? "true" : undefined}
+                    href={sectionHref(item.href, isHome)}
+                    aria-current={
+                      isHome && activeHref === item.href ? "true" : undefined
+                    }
+                    onClick={(e) => onSectionClick(e, item.href)}
                     className={navClass(item.href)}
                   >
                     {item.label}
@@ -136,9 +170,11 @@ export function Header() {
             {navItems.map((item) => (
               <li key={item.href}>
                 <a
-                  href={item.href}
-                  aria-current={activeHref === item.href ? "true" : undefined}
-                  onClick={() => setOpen(false)}
+                  href={sectionHref(item.href, isHome)}
+                  aria-current={
+                    isHome && activeHref === item.href ? "true" : undefined
+                  }
+                  onClick={(e) => onSectionClick(e, item.href)}
                   className={navClass(item.href, true)}
                 >
                   {item.label}

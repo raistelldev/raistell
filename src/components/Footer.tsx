@@ -9,8 +9,14 @@ export function Footer() {
   const pathname = usePathname();
   const { audience } = useAudience();
   const navItems = navByAudience[audience];
+  const isHome = pathname === "/";
 
   if (pathname?.startsWith("/admin")) return null;
+
+  function sectionHref(hash: string) {
+    if (!hash.startsWith("#")) return hash;
+    return isHome ? hash : `/${hash}`;
+  }
 
   return (
     <footer className="bg-dark">
@@ -30,7 +36,7 @@ export function Footer() {
               {navItems.map((item) => (
                 <li key={item.href}>
                   <a
-                    href={item.href}
+                    href={sectionHref(item.href)}
                     className="text-sm text-on-dark/75 hover:text-on-dark"
                   >
                     {item.label}

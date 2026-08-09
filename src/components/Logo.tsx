@@ -10,7 +10,7 @@ export function Logo({
 }) {
   return (
     <a
-      href="#start"
+      href="/#start"
       aria-label={`${site.name} – zur Startseite`}
       className={`font-brand font-semibold tracking-tight ${
         variant === "stacked" ? "text-lg" : "text-xl"
