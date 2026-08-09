@@ -239,20 +239,21 @@ function CreatorFields({
             className={inputCls}
           />
         </Field>
-        <Field label="Region" htmlFor="region" required>
+        <Field label="Region" htmlFor="region-creator" required>
           <input
-            id="region"
+            id="region-creator"
             name="region"
             type="text"
             required
             placeholder="München, Bayern / DACH"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            inputMode="text"
             className={inputCls}
           />
         </Field>
-      </div>
-
-      <MultiSelect
-        label="Plattform"
         hint="Mehrfachauswahl möglich"
         name="platforms"
         options={formOptions.platforms}
@@ -368,13 +369,18 @@ function CompanyFields({
             className={inputCls}
           />
         </Field>
-        <Field label="Region" htmlFor="region" required>
+        <Field label="Region" htmlFor="region-firma" required>
           <input
-            id="region"
+            id="region-firma"
             name="region"
             type="text"
             required
             placeholder="München, Bayern / DACH"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            inputMode="text"
             className={inputCls}
           />
         </Field>
