@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-/*
-  Cookie-Hinweis (DSGVO-Platzhalter).
-  Speichert die Auswahl lokal, damit der Hinweis nicht erneut erscheint.
-  Für den Produktivbetrieb durch ein geprüftes Consent-Tool ersetzen.
-*/
+/* Speichert die Cookie-Auswahl lokal, damit der Hinweis nicht erneut erscheint. */
 const STORAGE_KEY = "cookie-consent";
 
 export function CookieBanner() {

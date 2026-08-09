@@ -4,7 +4,9 @@ import { getImpressum } from "@/lib/db";
 import { site } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `Impressum – ${site.name}`,
+  title: "Impressum",
+  description: `Impressum und Anbieterkennzeichnung von ${site.name}.`,
+  alternates: { canonical: "/impressum" },
 };
 
 export const dynamic = "force-dynamic";

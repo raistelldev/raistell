@@ -1,10 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ThankYouContent } from "@/components/ThankYouContent";
-import { site } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `Danke – ${site.name}`,
+  title: "Danke",
   description: "Ihre Anfrage ist bei uns angekommen.",
   robots: { index: false, follow: false },
 };

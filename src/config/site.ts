@@ -2,13 +2,14 @@
   ============================================================
   ZENTRALE INHALTE / KONFIGURATION
   ------------------------------------------------------------
-  Firmenname, Navigation, Texte und Kontaktdaten an EINER
-  Stelle. Zum Anpassen des Prototyps nur diese Datei ändern.
+  Firmenname, Navigation, Texte und Kontaktdaten an EINER Stelle.
   ============================================================
 */
 
 export const site = {
   name: "Raistell",
+  /** Kanonische Origin für Sitemap, robots und Metadata (ohne trailing slash). */
+  url: "https://raistell.de",
   contact: {
     email: "kontakt@raistell.de",
     phone: "",

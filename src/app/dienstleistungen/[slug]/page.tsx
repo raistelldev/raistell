@@ -16,9 +16,23 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const service = getService(slug);
+  if (!service) {
+    return { title: "Dienstleistung" };
+  }
+
+  const title = service.title;
+  const description = service.description;
+
   return {
-    title: service ? `${service.title} – ${site.name}` : "Dienstleistung",
-    description: service?.description,
+    title,
+    description,
+    alternates: { canonical: `/dienstleistungen/${slug}` },
+    openGraph: {
+      title: `${title} – ${site.name}`,
+      description,
+      url: `/dienstleistungen/${slug}`,
+      type: "website",
+    },
   };
 }
 
@@ -86,9 +100,6 @@ export default async function ServiceDetailPage({
         </a>
       </div>
 
-      <p className="mt-8 text-xs text-ink-soft">
-        Hinweis: Platzhalter-Inhalte für den Prototyp.
-      </p>
     </main>
   );
 }

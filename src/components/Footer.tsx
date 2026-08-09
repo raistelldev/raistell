@@ -69,11 +69,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-on-dark/15 pt-6 text-xs text-on-dark/60 sm:flex-row">
+        <div className="mt-10 border-t border-on-dark/15 pt-6 text-xs text-on-dark/60">
           <p>
             © {new Date().getFullYear()} {site.name}. Alle Rechte vorbehalten.
           </p>
-          <p>Prototyp / MVP – Inhalte sind Platzhalter.</p>
         </div>
       </div>
     </footer>

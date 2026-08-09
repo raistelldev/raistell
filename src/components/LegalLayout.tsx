@@ -17,10 +17,6 @@ export function LegalLayout({
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-ink-soft [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-ink [&_strong]:text-ink">
         {children}
       </div>
-      <p className="mt-12 rounded-theme border border-line bg-surface-alt p-4 text-xs text-ink-soft">
-        Hinweis: Platzhalter-Text für den Prototyp. Vor der Veröffentlichung
-        durch rechtsverbindliche Angaben (z. B. anwaltlich geprüft) ersetzen.
-      </p>
     </main>
   );
 }

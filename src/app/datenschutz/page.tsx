@@ -3,7 +3,9 @@ import { LegalLayout } from "@/components/LegalLayout";
 import { site } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `Datenschutzerklärung – ${site.name}`,
+  title: "Datenschutzerklärung",
+  description: `Datenschutzerklärung von ${site.name}.`,
+  alternates: { canonical: "/datenschutz" },
 };
 
 export default function DatenschutzPage() {
