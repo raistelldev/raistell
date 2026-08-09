@@ -25,16 +25,19 @@ const copy: Record<
   },
 };
 
-declare global {
-  interface Window {
-    Calendly?: {
-      initInlineWidget: (options: {
-        url: string;
-        parentElement: HTMLElement;
-        prefill?: { name?: string; email?: string };
-      }) => void;
-    };
+function buildCalendlyEmbedUrl(
+  baseUrl: string,
+  prefill: { name?: string; email?: string },
+) {
+  const url = new URL(baseUrl);
+  url.searchParams.set("embed_type", "Inline");
+  url.searchParams.set("hide_gdpr_banner", "1");
+  if (typeof window !== "undefined") {
+    url.searchParams.set("embed_domain", window.location.hostname);
   }
+  if (prefill.name) url.searchParams.set("name", prefill.name);
+  if (prefill.email) url.searchParams.set("email", prefill.email);
+  return url.toString();
 }
 
 export function ThankYouContent() {
@@ -50,85 +53,42 @@ export function ThankYouContent() {
       : process.env.NEXT_PUBLIC_CALENDLY_URL_FIRMA
     )?.trim() ?? "";
   const [visible, setVisible] = useState(false);
+  const [iframeSrc, setIframeSrc] = useState("");
 
-  const widgetUrl = useMemo(() => {
+  const openUrl = useMemo(() => {
     if (!calendlyUrl) return "";
-    const url = new URL(calendlyUrl);
-    url.searchParams.set("hide_gdpr_banner", "1");
-    return url.toString();
-  }, [calendlyUrl]);
+    try {
+      const url = new URL(calendlyUrl);
+      if (name) url.searchParams.set("name", name);
+      if (email) url.searchParams.set("email", email);
+      return url.toString();
+    } catch {
+      return calendlyUrl;
+    }
+  }, [calendlyUrl, name, email]);
 
   useEffect(() => {
     const t = window.setTimeout(() => setVisible(true), 40);
     return () => window.clearTimeout(t);
   }, []);
 
+  // Build embed URL on client (needs hostname for embed_domain)
   useEffect(() => {
-    if (!widgetUrl) return;
-
-    const parent = document.getElementById("calendly-embed");
-    if (!parent) return;
-
-    parent.innerHTML = "";
-
-    function mount() {
-      if (!parent || !window.Calendly) return;
-      window.Calendly.initInlineWidget({
-        url: widgetUrl,
-        parentElement: parent,
-        prefill: {
-          ...(name ? { name } : {}),
-          ...(email ? { email } : {}),
-        },
-      });
-
-      // Calendly setzt oft eine zu kleine iframe-Höhe – explizit nachziehen
-      const iframe = parent.querySelector("iframe");
-      if (iframe) {
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.minHeight = "100%";
-        iframe.style.border = "0";
-      }
-    }
-
-    const existingCss = document.querySelector<HTMLLinkElement>(
-      'link[data-calendly-css="true"]',
-    );
-    if (!existingCss) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://assets.calendly.com/assets/external/widget.css";
-      link.dataset.calendlyCss = "true";
-      document.head.appendChild(link);
-    }
-
-    const existing = document.querySelector<HTMLScriptElement>(
-      'script[data-calendly="true"]',
-    );
-
-    if (window.Calendly) {
-      mount();
+    if (!calendlyUrl) {
+      setIframeSrc("");
       return;
     }
-
-    const script =
-      existing ??
-      Object.assign(document.createElement("script"), {
-        src: "https://assets.calendly.com/assets/external/widget.js",
-        async: true,
-      });
-    script.dataset.calendly = "true";
-    script.onload = mount;
-
-    if (!existing) {
-      document.body.appendChild(script);
+    try {
+      setIframeSrc(
+        buildCalendlyEmbedUrl(calendlyUrl, {
+          ...(name ? { name } : {}),
+          ...(email ? { email } : {}),
+        }),
+      );
+    } catch {
+      setIframeSrc("");
     }
-
-    return () => {
-      script.onload = null;
-    };
-  }, [widgetUrl, name, email]);
+  }, [calendlyUrl, name, email]);
 
   return (
     <main className="relative flex flex-1 flex-col bg-dark">
@@ -180,16 +140,31 @@ export function ThankYouContent() {
           {text.next}
         </p>
 
-        {widgetUrl ? (
+        {iframeSrc ? (
           <div className="mt-12 w-full text-left">
             <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest text-brand">
               {text.calendlyHint}
             </p>
-            <div
-              id="calendly-embed"
-              className="calendly-inline-widget w-full rounded-theme border border-line/30 bg-surface"
-              style={{ minWidth: "320px", height: "1100px" }}
-            />
+            <div className="overflow-hidden rounded-theme border border-line/30 bg-surface">
+              <iframe
+                title="Calendly Terminbuchung"
+                src={iframeSrc}
+                className="block w-full border-0"
+                style={{ minWidth: "320px", height: "750px" }}
+                loading="lazy"
+              />
+            </div>
+            <p className="mt-3 text-center text-xs text-on-dark/60">
+              Kalender leer?{" "}
+              <a
+                href={openUrl || calendlyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand underline hover:text-brand-soft"
+              >
+                Termin in neuem Tab öffnen
+              </a>
+            </p>
           </div>
         ) : (
           <p className="mt-10 max-w-md text-sm text-on-dark/65">

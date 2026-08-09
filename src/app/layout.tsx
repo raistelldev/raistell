@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
@@ -20,6 +20,23 @@ export const metadata: Metadata = {
     icon: [{ url: "/logo.png", type: "image/png", sizes: "512x512" }],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: site.name,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#173042",
 };
 
 export default function RootLayout({

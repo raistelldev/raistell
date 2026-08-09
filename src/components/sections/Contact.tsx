@@ -240,14 +240,7 @@ function CreatorFields({
           />
         </Field>
         <Field label="Region" htmlFor="region" required>
-          <input
-            id="region"
-            name="region"
-            type="text"
-            required
-            placeholder="z. B. München, Bayern / DACH"
-            className={inputCls}
-          />
+          <RegionInput id="region" name="region" required />
         </Field>
       </div>
 
@@ -379,17 +372,8 @@ function CompanyFields({
             className={inputCls}
           />
         </Field>
-        <Field label="Bundesland" htmlFor="state" required>
-          <Select id="state" name="state" required defaultValue="">
-            <option value="" disabled>
-              Bitte wählen
-            </option>
-            {formOptions.bundeslaender.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </Select>
+        <Field label="Region" htmlFor="region" required>
+          <RegionInput id="region" name="region" required />
         </Field>
         <Field label="Branche" htmlFor="industry" required>
           <input
@@ -595,6 +579,38 @@ function MultiSelect({
 
 const inputCls =
   "w-full rounded-theme border border-line bg-page px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand-soft";
+
+function RegionInput({
+  id,
+  name,
+  required,
+}: {
+  id: string;
+  name: string;
+  required?: boolean;
+}) {
+  const listId = `${id}-suggestions`;
+
+  return (
+    <>
+      <input
+        id={id}
+        name={name}
+        type="text"
+        required={required}
+        list={listId}
+        placeholder="z. B. München, Bayern / DACH"
+        autoComplete="address-level1"
+        className={inputCls}
+      />
+      <datalist id={listId}>
+        {formOptions.bundeslaender.map((s) => (
+          <option key={s} value={s} />
+        ))}
+      </datalist>
+    </>
+  );
+}
 
 function Field({
   label,

@@ -79,6 +79,8 @@ html {
   scroll-behavior: smooth;
   /* Offset = Header-Höhe (h-16), damit Anker exakt unter dem Header landen */
   scroll-padding-top: 4rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -87,6 +89,8 @@ body {
   /* Fallback laut Vorgabe: Arial oder systemeigene Sans-Serif */
   font-family: var(--font-sans), Arial, system-ui, sans-serif;
   font-optical-sizing: auto;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
 }
 
 /* Header: Gebäude-Foto + leichte Wash */
