@@ -16,6 +16,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: `${site.name} – Authentische Creator für die Energiewende`,
   description: companyFunnel.hero.subtitle,
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png", sizes: "512x512" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 import { site } from "@/config/site";
 
-/* Nur Firmenname als Text – Bildmarke vorerst entfernt. */
+/* Nur Firmenname als Text – Bildmarke nur als Favicon (Tab). */
 export function Logo({
   variant = "inline",
   className = "",
