@@ -54,6 +54,7 @@ export function ThankYouContent() {
     )?.trim() ?? "";
   const [visible, setVisible] = useState(false);
   const [iframeSrc, setIframeSrc] = useState("");
+  const [calendarReady, setCalendarReady] = useState(false);
 
   const openUrl = useMemo(() => {
     if (!calendlyUrl) return "";
@@ -72,13 +73,13 @@ export function ThankYouContent() {
     return () => window.clearTimeout(t);
   }, []);
 
-  // Build embed URL on client (needs hostname for embed_domain)
   useEffect(() => {
     if (!calendlyUrl) {
       setIframeSrc("");
       return;
     }
     try {
+      setCalendarReady(false);
       setIframeSrc(
         buildCalendlyEmbedUrl(calendlyUrl, {
           ...(name ? { name } : {}),
@@ -145,13 +146,35 @@ export function ThankYouContent() {
             <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest text-brand">
               {text.calendlyHint}
             </p>
-            <div className="overflow-hidden rounded-theme border border-line/30 bg-surface">
+            <div className="relative overflow-hidden rounded-theme border border-line/30 bg-surface">
+              {!calendarReady && (
+                <div
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-surface px-6"
+                  aria-live="polite"
+                  aria-busy="true"
+                >
+                  <span
+                    className="h-9 w-9 animate-spin rounded-full border-2 border-brand/25 border-t-brand"
+                    aria-hidden
+                  />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-ink">
+                      Kalender wird geladen …
+                    </p>
+                    <p className="mt-1 text-xs text-ink-soft">
+                      Das kann einen Moment dauern
+                    </p>
+                  </div>
+                </div>
+              )}
               <iframe
                 title="Calendly Terminbuchung"
                 src={iframeSrc}
-                className="block w-full border-0"
+                className={`block w-full border-0 transition-opacity duration-300 ${
+                  calendarReady ? "opacity-100" : "opacity-0"
+                }`}
                 style={{ minWidth: "320px", height: "750px" }}
-                loading="lazy"
+                onLoad={() => setCalendarReady(true)}
               />
             </div>
             <p className="mt-3 text-center text-xs text-on-dark/60">

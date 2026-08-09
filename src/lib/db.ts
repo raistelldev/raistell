@@ -124,6 +124,20 @@ export async function listLeadsByIds(ids: string[]) {
   `;
 }
 
+export async function deleteLeadsByIds(ids: string[]) {
+  await ensureSchema();
+  if (ids.length === 0) return 0;
+  const sql = getSql();
+
+  const rows = await sql<{ id: string }[]>`
+    DELETE FROM leads
+    WHERE id IN ${sql(ids)}
+    RETURNING id
+  `;
+
+  return rows.length;
+}
+
 export type ImpressumData = {
   providerName: string;
   street: string;

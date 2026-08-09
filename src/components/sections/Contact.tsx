@@ -240,7 +240,14 @@ function CreatorFields({
           />
         </Field>
         <Field label="Region" htmlFor="region" required>
-          <RegionInput id="region" name="region" required />
+          <input
+            id="region"
+            name="region"
+            type="text"
+            required
+            placeholder="München, Bayern / DACH"
+            className={inputCls}
+          />
         </Field>
       </div>
 
@@ -301,26 +308,15 @@ function CreatorFields({
         <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
           Optional
         </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Media Kit" htmlFor="mediakit" optional>
-            <input
-              id="mediakit"
-              name="mediakit"
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg,.webp"
-              className={`${inputCls} file:mr-3 file:rounded file:border-0 file:bg-brand-soft file:px-2 file:py-1 file:text-xs file:font-semibold file:text-brand`}
-            />
-          </Field>
-          <Field label="Preisvorstellung" htmlFor="price" optional>
-            <input
-              id="price"
-              name="price"
-              type="text"
-              placeholder="z. B. ab 500 €"
-              className={inputCls}
-            />
-          </Field>
-        </div>
+        <Field label="Preisvorstellung" htmlFor="price" optional>
+          <input
+            id="price"
+            name="price"
+            type="text"
+            placeholder="z. B. ab 500 €"
+            className={inputCls}
+          />
+        </Field>
       </div>
     </>
   );
@@ -373,7 +369,14 @@ function CompanyFields({
           />
         </Field>
         <Field label="Region" htmlFor="region" required>
-          <RegionInput id="region" name="region" required />
+          <input
+            id="region"
+            name="region"
+            type="text"
+            required
+            placeholder="München, Bayern / DACH"
+            className={inputCls}
+          />
         </Field>
         <Field label="Branche" htmlFor="industry" required>
           <input
@@ -579,38 +582,6 @@ function MultiSelect({
 
 const inputCls =
   "w-full rounded-theme border border-line bg-page px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand-soft";
-
-function RegionInput({
-  id,
-  name,
-  required,
-}: {
-  id: string;
-  name: string;
-  required?: boolean;
-}) {
-  const listId = `${id}-suggestions`;
-
-  return (
-    <>
-      <input
-        id={id}
-        name={name}
-        type="text"
-        required={required}
-        list={listId}
-        placeholder="z. B. München, Bayern / DACH"
-        autoComplete="address-level1"
-        className={inputCls}
-      />
-      <datalist id={listId}>
-        {formOptions.bundeslaender.map((s) => (
-          <option key={s} value={s} />
-        ))}
-      </datalist>
-    </>
-  );
-}
 
 function Field({
   label,

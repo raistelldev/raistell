@@ -24,7 +24,6 @@ const FIELD_LABELS: Record<string, string> = {
   topic: "Themengebiet",
   about: "Content",
   price: "Preisvorstellung",
-  mediakit: "Media Kit",
   role: "Rolle",
 };
 
@@ -117,6 +116,7 @@ export function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [impressum, setImpressum] = useState<ImpressumData | null>(null);
   const [impressumSaving, setImpressumSaving] = useState(false);
@@ -250,6 +250,46 @@ export function AdminDashboard() {
     }
   }
 
+  async function deleteLeads(ids: string[]) {
+    if (ids.length === 0) return;
+    const label =
+      ids.length === 1
+        ? "Diesen Eintrag wirklich löschen?"
+        : `${ids.length} Einträge wirklich löschen?`;
+    if (!window.confirm(label)) return;
+
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/leads", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      if (res.status === 401) {
+        router.replace("/admin/login");
+        return;
+      }
+      const data = (await res.json()) as { deleted?: number; error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Löschen fehlgeschlagen.");
+        return;
+      }
+      const idSet = new Set(ids);
+      setLeads((prev) => prev.filter((l) => !idSet.has(l.id)));
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (const id of ids) next.delete(id);
+        return next;
+      });
+      if (detailLead && idSet.has(detailLead.id)) setDetailLead(null);
+    } catch {
+      setError("Netzwerkfehler beim Löschen.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.replace("/admin/login");
@@ -364,29 +404,37 @@ export function AdminDashboard() {
 
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <ExportButton
-                disabled={exporting}
+                disabled={exporting || deleting}
                 onClick={() => void exportLeads("all")}
               >
                 Alle CSV
               </ExportButton>
               <ExportButton
-                disabled={exporting}
+                disabled={exporting || deleting}
                 onClick={() => void exportLeads("firma")}
               >
                 Unternehmen
               </ExportButton>
               <ExportButton
-                disabled={exporting}
+                disabled={exporting || deleting}
                 onClick={() => void exportLeads("creator")}
               >
                 Creator
               </ExportButton>
               <ExportButton
-                disabled={exporting || selected.size === 0}
+                disabled={exporting || deleting || selected.size === 0}
                 onClick={() => void exportLeads("selected")}
               >
                 Auswahl ({selected.size})
               </ExportButton>
+              <button
+                type="button"
+                disabled={deleting || selected.size === 0}
+                onClick={() => void deleteLeads(Array.from(selected))}
+                className="rounded-theme border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deleting ? "Löscht …" : `Löschen (${selected.size})`}
+              </button>
             </div>
           </div>
 
@@ -448,13 +496,23 @@ export function AdminDashboard() {
                             {previewLine(lead)}
                           </p>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => setDetailLead(lead)}
-                          className="mt-3 w-full rounded-theme bg-brand px-3 py-2.5 text-sm font-semibold text-on-brand"
-                        >
-                          Details ansehen
-                        </button>
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setDetailLead(lead)}
+                            className="rounded-theme bg-brand px-3 py-2.5 text-sm font-semibold text-on-brand"
+                          >
+                            Details
+                          </button>
+                          <button
+                            type="button"
+                            disabled={deleting}
+                            onClick={() => void deleteLeads([lead.id])}
+                            className="rounded-theme border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50"
+                          >
+                            Löschen
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -471,7 +529,7 @@ export function AdminDashboard() {
                     <col />
                     <col className="w-[18%]" />
                     <col className="w-28" />
-                    <col className="w-24" />
+                    <col className="w-36" />
                   </colgroup>
                   <thead className="border-b border-line bg-surface-alt/80 text-xs uppercase tracking-wide text-ink-soft">
                     <tr>
@@ -526,13 +584,23 @@ export function AdminDashboard() {
                           <span className="truncate block">{phoneOf(lead)}</span>
                         </td>
                         <td className="px-3 py-3 align-middle">
-                          <button
-                            type="button"
-                            onClick={() => setDetailLead(lead)}
-                            className="rounded-theme border border-line px-2.5 py-1.5 text-xs font-semibold text-brand transition-colors hover:border-brand hover:bg-brand-soft"
-                          >
-                            Details
-                          </button>
+                          <div className="flex flex-wrap gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setDetailLead(lead)}
+                              className="rounded-theme border border-line px-2.5 py-1.5 text-xs font-semibold text-brand transition-colors hover:border-brand hover:bg-brand-soft"
+                            >
+                              Details
+                            </button>
+                            <button
+                              type="button"
+                              disabled={deleting}
+                              onClick={() => void deleteLeads([lead.id])}
+                              className="rounded-theme border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50"
+                            >
+                              Löschen
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -714,6 +782,17 @@ export function AdminDashboard() {
                   </div>
                 ))}
             </dl>
+
+            <div className="border-t border-line px-5 py-4">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => void deleteLeads([detailLead.id])}
+                className="w-full rounded-theme border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
+              >
+                {deleting ? "Löscht …" : "Eintrag löschen"}
+              </button>
+            </div>
           </div>
         </div>
       )}
