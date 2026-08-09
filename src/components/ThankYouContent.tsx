@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ctas, site } from "@/config/site";
@@ -8,9 +8,7 @@ import { ctas, site } from "@/config/site";
 type Role = "creator" | "firma";
 
 const CALENDLY_HEIGHT = 750;
-/** Same for both roles – only Calendly “ready” or this fallback clears the buffer */
-const READY_FALLBACK_MS = 10_000;
-const MIN_BUFFER_MS = 500;
+const READY_FALLBACK_MS = 8_000;
 
 const copy: Record<
   Role,
@@ -35,7 +33,11 @@ function buildCalendlyEmbedUrl(
   prefill: { name?: string; email?: string },
 ) {
   const url = new URL(baseUrl);
+  url.searchParams.set("embed_type", "Inline");
   url.searchParams.set("hide_gdpr_banner", "1");
+  if (typeof window !== "undefined") {
+    url.searchParams.set("embed_domain", window.location.hostname);
+  }
   if (prefill.name) url.searchParams.set("name", prefill.name);
   if (prefill.email) url.searchParams.set("email", prefill.email);
   return url.toString();
@@ -45,51 +47,13 @@ function isCalendlyReadyMessage(data: unknown) {
   if (!data || typeof data !== "object") return false;
   const event = (data as { event?: unknown }).event;
   if (typeof event !== "string" || !event.startsWith("calendly.")) return false;
-  // Same signals for event-type and profile embeds
   return (
     event === "calendly.event_type_viewed" ||
     event === "calendly.profile_page_viewed" ||
-    event === "calendly.page_height"
+    event === "calendly.page_height" ||
+    event === "calendly.date_and_time_selected" ||
+    event === "calendly.event_scheduled"
   );
-}
-
-declare global {
-  interface Window {
-    Calendly?: {
-      initInlineWidget: (opts: {
-        url: string;
-        parentElement: HTMLElement;
-        prefill?: { name?: string; email?: string };
-      }) => void;
-    };
-  }
-}
-
-function loadCalendlyScript() {
-  const existing = document.querySelector<HTMLScriptElement>(
-    'script[data-calendly-widget="1"]',
-  );
-  if (existing) {
-    return existing.dataset.loaded === "1"
-      ? Promise.resolve()
-      : new Promise<void>((resolve, reject) => {
-          existing.addEventListener("load", () => resolve(), { once: true });
-          existing.addEventListener("error", () => reject(), { once: true });
-        });
-  }
-
-  return new Promise<void>((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://assets.calendly.com/assets/external/widget.js";
-    script.async = true;
-    script.dataset.calendlyWidget = "1";
-    script.onload = () => {
-      script.dataset.loaded = "1";
-      resolve();
-    };
-    script.onerror = () => reject(new Error("Calendly script failed"));
-    document.body.appendChild(script);
-  });
 }
 
 export function ThankYouContent() {
@@ -106,11 +70,8 @@ export function ThankYouContent() {
     )?.trim() ?? "";
 
   const [visible, setVisible] = useState(false);
+  const [iframeSrc, setIframeSrc] = useState("");
   const [calendarReady, setCalendarReady] = useState(false);
-  const [embedFailed, setEmbedFailed] = useState(false);
-  const widgetParentRef = useRef<HTMLDivElement>(null);
-  const mountedAtRef = useRef(0);
-  const readyLockRef = useRef(false);
 
   const openUrl = useMemo(() => {
     if (!calendlyUrl) return "";
@@ -124,74 +85,31 @@ export function ThankYouContent() {
     }
   }, [calendlyUrl, name, email]);
 
-  const embedUrl = useMemo(() => {
-    if (!calendlyUrl) return "";
-    try {
-      return buildCalendlyEmbedUrl(calendlyUrl, {
-        ...(name ? { name } : {}),
-        ...(email ? { email } : {}),
-      });
-    } catch {
-      return "";
-    }
-  }, [calendlyUrl, name, email]);
-
-  function markReady() {
-    if (readyLockRef.current) return;
-    const elapsed = Date.now() - mountedAtRef.current;
-    const wait = Math.max(0, MIN_BUFFER_MS - elapsed);
-    window.setTimeout(() => {
-      if (readyLockRef.current) return;
-      readyLockRef.current = true;
-      setCalendarReady(true);
-    }, wait);
-  }
-
   useEffect(() => {
     const t = window.setTimeout(() => setVisible(true), 40);
     return () => window.clearTimeout(t);
   }, []);
 
-  // Official Calendly widget – same init path for firma & creator
   useEffect(() => {
-    if (!embedUrl || !widgetParentRef.current) return;
+    if (!calendlyUrl) {
+      setIframeSrc("");
+      return;
+    }
+    try {
+      setCalendarReady(false);
+      setIframeSrc(
+        buildCalendlyEmbedUrl(calendlyUrl, {
+          ...(name ? { name } : {}),
+          ...(email ? { email } : {}),
+        }),
+      );
+    } catch {
+      setIframeSrc("");
+    }
+  }, [calendlyUrl, name, email]);
 
-    let cancelled = false;
-    readyLockRef.current = false;
-    mountedAtRef.current = Date.now();
-    setCalendarReady(false);
-    setEmbedFailed(false);
-    widgetParentRef.current.innerHTML = "";
-
-    void (async () => {
-      try {
-        await loadCalendlyScript();
-        if (cancelled || !widgetParentRef.current || !window.Calendly) return;
-        window.Calendly.initInlineWidget({
-          url: embedUrl,
-          parentElement: widgetParentRef.current,
-          prefill: {
-            ...(name ? { name } : {}),
-            ...(email ? { email } : {}),
-          },
-        });
-      } catch {
-        if (!cancelled) {
-          setEmbedFailed(true);
-          markReady();
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- markReady is stable enough via refs
-  }, [embedUrl, name, email, role]);
-
-  // Identical ready signal for both roles
   useEffect(() => {
-    if (!embedUrl || calendarReady) return;
+    if (!iframeSrc || calendarReady) return;
 
     function onMessage(e: MessageEvent) {
       if (
@@ -200,18 +118,20 @@ export function ThankYouContent() {
       ) {
         return;
       }
-      if (isCalendlyReadyMessage(e.data)) markReady();
+      if (isCalendlyReadyMessage(e.data)) setCalendarReady(true);
     }
 
     window.addEventListener("message", onMessage);
-    const fallback = window.setTimeout(() => markReady(), READY_FALLBACK_MS);
+    const fallback = window.setTimeout(
+      () => setCalendarReady(true),
+      READY_FALLBACK_MS,
+    );
 
     return () => {
       window.removeEventListener("message", onMessage);
       window.clearTimeout(fallback);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [embedUrl, role, calendarReady]);
+  }, [iframeSrc, calendarReady]);
 
   return (
     <main className="relative flex flex-1 flex-col bg-dark">
@@ -263,7 +183,7 @@ export function ThankYouContent() {
           {text.next}
         </p>
 
-        {embedUrl ? (
+        {iframeSrc ? (
           <div className="mt-12 w-full text-left">
             <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest text-brand">
               {text.calendlyHint}
@@ -273,59 +193,55 @@ export function ThankYouContent() {
               className="relative overflow-hidden rounded-theme border border-line/30 bg-surface"
               style={{ minHeight: CALENDLY_HEIGHT }}
             >
-              <div
-                className={`absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-surface px-6 transition-opacity duration-500 ease-out ${
-                  calendarReady
-                    ? "pointer-events-none opacity-0"
-                    : "opacity-100"
-                }`}
-                aria-live="polite"
-                aria-busy={!calendarReady}
-              >
-                <div className="relative h-11 w-11" aria-hidden>
-                  <span className="absolute inset-0 rounded-full border-2 border-brand/20" />
-                  <span className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-brand" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-ink">
-                    Kalender wird geladen …
-                  </p>
-                  <p className="mt-1.5 text-xs text-ink-soft">
-                    Terminauswahl erscheint gleich hier
-                  </p>
-                </div>
-                <div className="w-full max-w-sm space-y-3 px-4" aria-hidden>
-                  <div className="h-10 animate-pulse rounded-theme bg-brand-soft/70" />
-                  <div className="grid grid-cols-7 gap-2">
-                    {Array.from({ length: 14 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="aspect-square animate-pulse rounded-md bg-brand-soft/50"
-                        style={{ animationDelay: `${(i % 7) * 80}ms` }}
-                      />
-                    ))}
+              {/* Buffer sits on top; iframe always loads underneath (must stay visible to Calendly) */}
+              {!calendarReady && (
+                <div
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-surface px-6"
+                  aria-live="polite"
+                  aria-busy="true"
+                >
+                  <div className="relative h-11 w-11" aria-hidden>
+                    <span className="absolute inset-0 rounded-full border-2 border-brand/20" />
+                    <span className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-brand" />
                   </div>
-                  <div className="h-3 w-[66%] animate-pulse rounded-full bg-brand-soft/40" />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-ink">
+                      Kalender wird geladen …
+                    </p>
+                    <p className="mt-1.5 text-xs text-ink-soft">
+                      Terminauswahl erscheint gleich hier
+                    </p>
+                  </div>
+                  <div className="w-full max-w-sm space-y-3 px-4" aria-hidden>
+                    <div className="h-10 animate-pulse rounded-theme bg-brand-soft/70" />
+                    <div className="grid grid-cols-7 gap-2">
+                      {Array.from({ length: 14 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="aspect-square animate-pulse rounded-md bg-brand-soft/50"
+                          style={{ animationDelay: `${(i % 7) * 80}ms` }}
+                        />
+                      ))}
+                    </div>
+                    <div className="h-3 w-[66%] animate-pulse rounded-full bg-brand-soft/40" />
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div
-                ref={widgetParentRef}
-                className={`calendly-inline-widget transition-opacity duration-500 ease-out ${
-                  calendarReady ? "opacity-100" : "opacity-0"
-                }`}
-                style={{
-                  minWidth: "320px",
-                  height: CALENDLY_HEIGHT,
-                  visibility: calendarReady ? "visible" : "hidden",
+              <iframe
+                title="Calendly Terminbuchung"
+                src={iframeSrc}
+                className="block w-full border-0"
+                style={{ minWidth: "320px", height: CALENDLY_HEIGHT }}
+                onLoad={() => {
+                  // Paint delay; postMessage may already have cleared the buffer
+                  window.setTimeout(() => setCalendarReady(true), 1200);
                 }}
               />
             </div>
 
             <p className="mt-3 text-center text-xs text-on-dark/60">
-              {embedFailed
-                ? "Kalender konnte nicht eingebettet werden. "
-                : "Kalender leer? "}
+              Kalender leer?{" "}
               <a
                 href={openUrl || calendlyUrl}
                 target="_blank"
