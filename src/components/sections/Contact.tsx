@@ -254,6 +254,10 @@ function CreatorFields({
             className={inputCls}
           />
         </Field>
+      </div>
+
+      <MultiSelect
+        label="Plattform"
         hint="Mehrfachauswahl möglich"
         name="platforms"
         options={formOptions.platforms}
