@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS leads (
 CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC);
 CREATE INDEX IF NOT EXISTS leads_role_idx ON leads (role);
 CREATE INDEX IF NOT EXISTS leads_email_idx ON leads (email);
+
+CREATE TABLE IF NOT EXISTS site_settings (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

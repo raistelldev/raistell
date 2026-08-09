@@ -1,25 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 import { useAudience } from "@/components/AudienceContext";
 import { ctas, navByAudience } from "@/config/site";
 
 export function Header() {
+  const pathname = usePathname();
   const { audience, setAudience } = useAudience();
   const navItems = navByAudience[audience];
   const [open, setOpen] = useState(false);
   const [activeHref, setActiveHref] = useState("#start");
   const primaryCta = audience === "firma" ? ctas.company : ctas.creator;
+  const isAdmin = pathname?.startsWith("/admin") ?? false;
 
   useEffect(() => {
+    if (isAdmin) return;
     const mq = window.matchMedia("(min-width: 768px)");
     const onChange = () => mq.matches && setOpen(false);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
+    if (isAdmin) return;
     setActiveHref("#start");
     const ids = navItems.map((item) => item.href.replace("#", ""));
     const elements = ids
@@ -44,7 +49,7 @@ export function Header() {
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [navItems]);
+  }, [navItems, isAdmin]);
 
   function navClass(href: string, mobile = false) {
     const active = activeHref === href;
@@ -67,6 +72,8 @@ export function Header() {
 
   const ctaLabel =
     audience === "firma" ? ctas.company.shortLabel : ctas.creator.label;
+
+  if (isAdmin) return null;
 
   return (
     <header className="header-facet sticky top-0 z-50 border-b border-line">

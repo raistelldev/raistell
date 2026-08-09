@@ -1,12 +1,16 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 import { useAudience } from "@/components/AudienceContext";
 import { navByAudience, site } from "@/config/site";
 
 export function Footer() {
+  const pathname = usePathname();
   const { audience } = useAudience();
   const navItems = navByAudience[audience];
+
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <footer className="bg-dark">

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
+import { getImpressum } from "@/lib/db";
 import { site } from "@/config/site";
 
 export const metadata: Metadata = {
   title: `Impressum – ${site.name}`,
 };
 
-export default function ImpressumPage() {
-  const { legal } = site;
+export const dynamic = "force-dynamic";
+
+export default async function ImpressumPage() {
+  const legal = await getImpressum();
 
   return (
     <LegalLayout title="Impressum">
@@ -29,11 +32,11 @@ export default function ImpressumPage() {
 
       <h2>Kontakt</h2>
       <p>
-        E-Mail: {site.contact.email}
-        {site.contact.phone ? (
+        E-Mail: {legal.email}
+        {legal.phone ? (
           <>
             <br />
-            Telefon: {site.contact.phone}
+            Telefon: {legal.phone}
           </>
         ) : null}
       </p>
@@ -45,7 +48,7 @@ export default function ImpressumPage() {
       <p>
         Umsatzsteuer-Identifikationsnummer bzw. Steuernummer:
         <br />
-        [falls vorhanden eintragen]
+        {legal.vatInfo}
       </p>
 
       <h2>Vertreter in der EU</h2>

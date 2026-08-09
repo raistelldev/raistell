@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { insertLead, type LeadRole } from "@/lib/db";
-import { sendLeadEmails } from "@/lib/mail";
 
 export const runtime = "nodejs";
 
@@ -72,7 +71,6 @@ export async function POST(request: Request) {
   const payload: Record<string, unknown> = { ...body };
   delete payload.role;
 
-  // Normalize multi-selects
   if (role === "creator") {
     payload.platforms = asStringArray(body.platforms);
   } else {
@@ -81,13 +79,6 @@ export async function POST(request: Request) {
 
   try {
     const lead = await insertLead({
-      role: role as LeadRole,
-      email,
-      name,
-      payload,
-    });
-
-    await sendLeadEmails({
       role: role as LeadRole,
       email,
       name,

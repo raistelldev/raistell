@@ -101,10 +101,11 @@ export const formOptions = {
     "Ich bin noch unsicher / Beratung",
   ] as const,
   budgets: [
-    "noch offen",
-    "bis 5.000 €",
-    "5.000–20.000 €",
-    "über 20.000 €",
+    "Noch offen / Beratung gewünscht",
+    "Bis 2.500 €",
+    "2.500–5.000 €",
+    "5.000–10.000 €",
+    "Über 10.000 €",
   ] as const,
 } as const;
 
@@ -128,14 +129,14 @@ export const companyFunnel = {
   },
   whyCreators: {
     eyebrow: "Warum Creator?",
-    title: "Ein Banner verkauft. Ein Creator überzeugt.",
+    title: "Werbebanner verkaufen. Creator schaffen Vertrauen.",
     ad: {
-      label: "Ein Werbebanner sagt:",
+      label: "Ein Banner sagt:",
       text: "„Kauf dieses Produkt.“",
     },
     creator: {
-      label: "Ein Creator zeigt:",
-      text: "„Ich nutze dieses Produkt.“",
+      label: "Ein Creator sagt:",
+      text: "„Lass mich dir zeigen, warum.“",
     },
   },
   whyRaistell: {
@@ -178,7 +179,7 @@ export const companyFunnel = {
     eyebrow: "Warum uns vertrauen?",
     title: "Klarer Fokus. Saubere Abläufe.",
     points: [
-      "Fokus ausschließlich auf die Energiewende",
+      "Fokus auf die Energiewende",
       "Regional passende Creator",
       "Standardisierte Briefings",
       "Strukturierte Projektabwicklung",
@@ -205,7 +206,7 @@ export const companyFunnel = {
         },
       ],
       closing:
-        "Aus Raisting und Telstar entstand Raistell. Die Idee dahinter bleibt aktuell: Verbindungen schaffen, die ohne den richtigen Vermittler nicht entstehen würden.",
+        "Aus Raisting und Telstar entstand Raistell. Die Idee dahinter bleibt bis heute dieselbe: Verbindungen schaffen, die ohne den richtigen Partner nicht entstehen würden.",
     },
   },
   faq: {
@@ -259,17 +260,17 @@ export const creatorFunnel = {
   },
   problem: {
     eyebrow: "Das Problem",
-    title: "Gute Kooperationen zu finden, kostet Zeit.",
+    title: "Die richtigen Kooperationen sind schwer zu finden.",
     points: [
-      "Die Suche nach passenden Kooperationen kostet Zeit.",
-      "Viele Anfragen passen nicht zum eigenen Content.",
-      "Häufig fehlen klare Briefings oder faire Abläufe.",
+      "Viele Anfragen passen nicht zu deinem Content.",
+      "Unklare Briefings machen Projekte unnötig kompliziert.",
+      "Faire und langfristige Kooperationen sind selten.",
     ],
   },
   solution: {
     eyebrow: "Unsere Lösung",
-    title: "Wir übernehmen den organisatorischen Teil.",
-    text: "Damit du dich auf deinen Content konzentrieren kannst.",
+    title: "Wir bringen die richtigen Partner zusammen.",
+    text: "Mit klaren Abläufen – damit du dich auf deinen Content konzentrieren kannst.",
   },
   whyRaistell: {
     eyebrow: "Warum Raistell?",

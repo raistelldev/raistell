@@ -4,16 +4,17 @@ import { useId, useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAudience } from "@/components/AudienceContext";
 import { Section, SectionHeading } from "@/components/Section";
-import { ctas, formOptions, site } from "@/config/site";
+import { formOptions, site } from "@/config/site";
 
 export function Contact() {
   const router = useRouter();
-  const { audience } = useAudience();
+  const { audience, setAudience } = useAudience();
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [platformError, setPlatformError] = useState(false);
   const [seeking, setSeeking] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const isCompany = audience === "firma";
 
   useEffect(() => {
     setPlatforms([]);
@@ -85,8 +86,12 @@ export function Contact() {
     }
   }
 
-  const submitLabel =
-    audience === "firma" ? ctas.company.label : ctas.creator.finalLabel;
+  const submitLabel = "Termin buchen";
+
+  const questionsLine =
+    audience === "firma"
+      ? "Fragen? Schreiben Sie uns:"
+      : "Fragen? Wir helfen gerne weiter:";
 
   const heading =
     audience === "firma"
@@ -110,7 +115,42 @@ export function Contact() {
         onDark
       />
 
-      <div className="mx-auto mt-10 max-w-2xl rounded-theme border border-line bg-surface p-6 sm:p-8">
+      <div className="mx-auto mt-8 flex w-full max-w-md justify-center px-0">
+        <div
+          role="tablist"
+          aria-label="Für wen sind Sie hier?"
+          className="flex w-full rounded-full border border-on-dark/20 bg-dark-strong/50 p-1"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={isCompany}
+            onClick={() => setAudience("firma")}
+            className={`flex-1 rounded-full px-3 py-2.5 text-sm font-semibold transition-colors ${
+              isCompany
+                ? "bg-on-dark text-brand-strong"
+                : "text-on-dark/70 hover:text-on-dark"
+            }`}
+          >
+            Unternehmen
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!isCompany}
+            onClick={() => setAudience("creator")}
+            className={`flex-1 rounded-full px-3 py-2.5 text-sm font-semibold transition-colors ${
+              !isCompany
+                ? "bg-on-dark text-brand-strong"
+                : "text-on-dark/70 hover:text-on-dark"
+            }`}
+          >
+            Creator
+          </button>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-8 max-w-2xl rounded-theme border border-line bg-surface p-6 sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-4" key={audience}>
           {audience === "creator" ? (
             <CreatorFields
@@ -152,7 +192,7 @@ export function Contact() {
             </p>
           )}
           <p className="text-center text-xs text-ink-soft">
-            Fragen?{" "}
+            {questionsLine}{" "}
             <a
               href={`mailto:${site.contact.email}`}
               className="text-brand hover:text-brand-strong"

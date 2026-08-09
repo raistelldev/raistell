@@ -44,7 +44,11 @@ export function ThankYouContent() {
   const text = copy[role];
   const name = params.get("name")?.trim() ?? "";
   const email = params.get("email")?.trim() ?? "";
-  const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL?.trim() ?? "";
+  const calendlyUrl =
+    (role === "creator"
+      ? process.env.NEXT_PUBLIC_CALENDLY_URL_CREATOR
+      : process.env.NEXT_PUBLIC_CALENDLY_URL_FIRMA
+    )?.trim() ?? "";
   const [visible, setVisible] = useState(false);
 
   const widgetUrl = useMemo(() => {
@@ -77,6 +81,26 @@ export function ThankYouContent() {
           ...(email ? { email } : {}),
         },
       });
+
+      // Calendly setzt oft eine zu kleine iframe-Höhe – explizit nachziehen
+      const iframe = parent.querySelector("iframe");
+      if (iframe) {
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.minHeight = "100%";
+        iframe.style.border = "0";
+      }
+    }
+
+    const existingCss = document.querySelector<HTMLLinkElement>(
+      'link[data-calendly-css="true"]',
+    );
+    if (!existingCss) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://assets.calendly.com/assets/external/widget.css";
+      link.dataset.calendlyCss = "true";
+      document.head.appendChild(link);
     }
 
     const existing = document.querySelector<HTMLScriptElement>(
@@ -107,7 +131,7 @@ export function ThankYouContent() {
   }, [widgetUrl, name, email]);
 
   return (
-    <main className="relative flex flex-1 flex-col overflow-hidden bg-dark">
+    <main className="relative flex flex-1 flex-col bg-dark">
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
@@ -118,7 +142,7 @@ export function ThankYouContent() {
       />
 
       <div
-        className={`relative mx-auto flex w-full max-w-3xl flex-1 flex-col items-center px-4 py-20 text-center transition-all duration-700 ease-out sm:py-28 ${
+        className={`relative mx-auto flex w-full max-w-3xl flex-1 flex-col items-center px-4 py-16 text-center transition-all duration-700 ease-out sm:py-20 ${
           visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >
@@ -163,7 +187,8 @@ export function ThankYouContent() {
             </p>
             <div
               id="calendly-embed"
-              className="min-h-[700px] w-full overflow-hidden rounded-theme border border-line/30 bg-surface"
+              className="calendly-inline-widget w-full rounded-theme border border-line/30 bg-surface"
+              style={{ minWidth: "320px", height: "1100px" }}
             />
           </div>
         ) : (

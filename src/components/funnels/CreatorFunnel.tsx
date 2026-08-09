@@ -1,6 +1,6 @@
 import { Section, SectionHeading } from "@/components/Section";
 import { Faq } from "@/components/sections/Faq";
-import { creatorFunnel } from "@/config/site";
+import { companyFunnel, creatorFunnel } from "@/config/site";
 
 function CheckIcon({ className = "" }: { className?: string }) {
   return (
@@ -18,6 +18,7 @@ function CheckIcon({ className = "" }: { className?: string }) {
 
 export function CreatorFunnel() {
   const f = creatorFunnel;
+  const founding = companyFunnel.founding;
 
   return (
     <>
@@ -37,8 +38,10 @@ export function CreatorFunnel() {
         <SectionHeading
           eyebrow={f.solution.eyebrow}
           title={f.solution.title}
-          intro={f.solution.text}
         />
+        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft sm:text-xl">
+          {f.solution.text}
+        </p>
       </Section>
 
       <Section id="warum-raistell" tone="light">
@@ -85,6 +88,39 @@ export function CreatorFunnel() {
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section id="geschichte" tone="dark">
+        <SectionHeading
+          eyebrow={founding.eyebrow}
+          title={founding.title}
+          intro={founding.text}
+          onDark
+        />
+
+        <div className="mt-16 border-t border-on-dark/20 pt-12">
+          <p className="text-sm font-semibold uppercase tracking-widest text-on-dark/75">
+            {founding.name.title}
+          </p>
+          <h3 className="mt-4 max-w-2xl font-brand text-2xl font-semibold tracking-tight text-on-dark sm:text-3xl">
+            {founding.name.intro}
+          </h3>
+          <div className="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
+            {founding.name.parts.map((part) => (
+              <div key={part.title} className="border-t border-on-dark/20 pt-6">
+                <h4 className="font-brand text-xl font-semibold text-on-dark">
+                  {part.title}
+                </h4>
+                <p className="mt-3 text-sm leading-relaxed text-on-dark/80">
+                  {part.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-12 max-w-3xl text-base leading-relaxed text-on-dark/85">
+            {founding.name.closing}
+          </p>
+        </div>
       </Section>
 
       <Faq

@@ -66,22 +66,50 @@ export function CompanyFunnel() {
           eyebrow={f.whyRaistell.eyebrow}
           title={f.whyRaistell.title}
         />
-        <ul className="mt-12 max-w-2xl space-y-5">
-          {f.whyRaistell.points.map((point, i) => (
-            <li
-              key={point}
-              className="border-t border-line pt-5 transition-[margin] duration-500"
-              style={{ marginLeft: `min(${i * 1.75}rem, ${i * 8}%)` }}
-            >
-              <span className="font-brand text-sm font-semibold tracking-widest text-brand">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <p className="mt-3 font-brand text-lg font-semibold text-ink sm:text-xl">
-                {point}
-              </p>
-            </li>
-          ))}
-        </ul>
+
+        {/* Mobile: vertikale Prozess-Schiene */}
+        <ol className="mt-12 md:hidden">
+          {f.whyRaistell.points.map((point, i) => {
+            const last = i === f.whyRaistell.points.length - 1;
+            return (
+              <li key={point} className="flex gap-4">
+                <div className="flex w-4 shrink-0 flex-col items-center" aria-hidden>
+                  <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-brand ring-4 ring-brand-soft" />
+                  {!last && (
+                    <span className="mt-1 w-px flex-1 bg-gradient-to-b from-brand/50 to-brand/15" />
+                  )}
+                </div>
+                <p
+                  className={`font-brand text-xl font-semibold leading-snug text-ink ${
+                    last ? "pb-0" : "pb-8"
+                  }`}
+                >
+                  {point}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+
+        {/* Desktop: horizontale Prozesskette */}
+        <ol className="mt-16 hidden grid-cols-5 gap-0 md:grid">
+          {f.whyRaistell.points.map((point, i) => {
+            const last = i === f.whyRaistell.points.length - 1;
+            return (
+              <li key={point} className="relative px-3 first:pl-0 last:pr-0">
+                <div className="flex items-center" aria-hidden>
+                  <span className="h-3 w-3 shrink-0 rounded-full bg-brand ring-4 ring-brand-soft" />
+                  {!last && (
+                    <span className="mx-2 h-px min-w-0 flex-1 bg-gradient-to-r from-brand/55 to-brand/20" />
+                  )}
+                </div>
+                <p className="mt-5 font-brand text-lg font-semibold leading-snug text-ink lg:text-xl">
+                  {point}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
       </Section>
 
       {/* Ablauf */}

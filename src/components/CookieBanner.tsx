@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 /*
   Cookie-Hinweis (DSGVO-Platzhalter).
@@ -10,18 +11,23 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "cookie-consent";
 
 export function CookieBanner() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (pathname?.startsWith("/admin")) {
+      setVisible(false);
+      return;
+    }
     if (!localStorage.getItem(STORAGE_KEY)) setVisible(true);
-  }, []);
+  }, [pathname]);
 
   function decide(value: "accepted" | "declined") {
     localStorage.setItem(STORAGE_KEY, value);
     setVisible(false);
   }
 
-  if (!visible) return null;
+  if (pathname?.startsWith("/admin") || !visible) return null;
 
   return (
     <div
