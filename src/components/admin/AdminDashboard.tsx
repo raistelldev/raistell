@@ -653,57 +653,6 @@ export function AdminDashboard() {
                   onChange={(v) => setImpressum({ ...impressum, phone: v })}
                 />
               </div>
-              <Field
-                label="Registereintrag / Kennnummer"
-                value={impressum.registerInfo}
-                onChange={(v) =>
-                  setImpressum({ ...impressum, registerInfo: v })
-                }
-              />
-              <Field
-                label="USt-IdNr. / Steuernummer"
-                value={impressum.vatInfo}
-                onChange={(v) => setImpressum({ ...impressum, vatInfo: v })}
-              />
-              <Field
-                label="EU-Vertreter Name"
-                value={impressum.euRepresentative.name}
-                onChange={(v) =>
-                  setImpressum({
-                    ...impressum,
-                    euRepresentative: {
-                      ...impressum.euRepresentative,
-                      name: v,
-                    },
-                  })
-                }
-              />
-              <Field
-                label="EU-Vertreter Adresse"
-                value={impressum.euRepresentative.address}
-                onChange={(v) =>
-                  setImpressum({
-                    ...impressum,
-                    euRepresentative: {
-                      ...impressum.euRepresentative,
-                      address: v,
-                    },
-                  })
-                }
-              />
-              <Field
-                label="EU-Vertreter E-Mail"
-                value={impressum.euRepresentative.email}
-                onChange={(v) =>
-                  setImpressum({
-                    ...impressum,
-                    euRepresentative: {
-                      ...impressum.euRepresentative,
-                      email: v,
-                    },
-                  })
-                }
-              />
 
               {impressumMessage && (
                 <p className="rounded-theme bg-brand-soft px-3 py-2 text-sm text-brand">

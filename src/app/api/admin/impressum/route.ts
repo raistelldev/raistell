@@ -44,21 +44,8 @@ export async function PUT(request: Request) {
       street: String(body.street ?? current.street),
       city: String(body.city ?? current.city),
       country: String(body.country ?? current.country),
-      registerInfo: String(body.registerInfo ?? current.registerInfo),
-      vatInfo: String(body.vatInfo ?? current.vatInfo),
       phone: String(body.phone ?? current.phone),
       email: String(body.email ?? current.email),
-      euRepresentative: {
-        name: String(
-          body.euRepresentative?.name ?? current.euRepresentative.name,
-        ),
-        address: String(
-          body.euRepresentative?.address ?? current.euRepresentative.address,
-        ),
-        email: String(
-          body.euRepresentative?.email ?? current.euRepresentative.email,
-        ),
-      },
     };
 
     const impressum = await saveImpressum(next);

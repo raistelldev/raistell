@@ -143,15 +143,8 @@ export type ImpressumData = {
   street: string;
   city: string;
   country: string;
-  registerInfo: string;
-  vatInfo: string;
   phone: string;
   email: string;
-  euRepresentative: {
-    name: string;
-    address: string;
-    email: string;
-  };
 };
 
 export function defaultImpressum(): ImpressumData {
@@ -160,15 +153,8 @@ export function defaultImpressum(): ImpressumData {
     street: site.legal.street,
     city: site.legal.city,
     country: site.legal.country,
-    registerInfo: site.legal.registerInfo,
-    vatInfo: "[falls vorhanden eintragen]",
     phone: site.contact.phone,
     email: site.contact.email,
-    euRepresentative: {
-      name: site.legal.euRepresentative.name,
-      address: site.legal.euRepresentative.address,
-      email: site.legal.euRepresentative.email,
-    },
   };
 }
 
@@ -176,22 +162,14 @@ function normalizeImpressum(raw: unknown): ImpressumData {
   const base = defaultImpressum();
   if (!raw || typeof raw !== "object") return base;
   const data = raw as Partial<ImpressumData>;
-  const eu = data.euRepresentative ?? base.euRepresentative;
 
   return {
     providerName: String(data.providerName ?? base.providerName),
     street: String(data.street ?? base.street),
     city: String(data.city ?? base.city),
     country: String(data.country ?? base.country),
-    registerInfo: String(data.registerInfo ?? base.registerInfo),
-    vatInfo: String(data.vatInfo ?? base.vatInfo),
     phone: String(data.phone ?? base.phone),
     email: String(data.email ?? base.email),
-    euRepresentative: {
-      name: String(eu.name ?? base.euRepresentative.name),
-      address: String(eu.address ?? base.euRepresentative.address),
-      email: String(eu.email ?? base.euRepresentative.email),
-    },
   };
 }
 

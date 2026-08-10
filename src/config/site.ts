@@ -19,12 +19,6 @@ export const site = {
     street: "[Straße und Hausnummer]",
     city: "[PLZ und Ort]",
     country: "Bosnien und Herzegowina",
-    registerInfo: "[Registernummer / JIB, falls vorhanden]",
-    euRepresentative: {
-      name: "[Name des EU-Vertreters]",
-      address: "[Anschrift in einem EU-Mitgliedstaat]",
-      email: "[E-Mail des EU-Vertreters]",
-    },
   },
 } as const;
 
