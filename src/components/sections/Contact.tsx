@@ -101,8 +101,8 @@ export function Contact() {
             "Unverbindlich und kostenlos. Wir melden uns persönlich bei Ihnen.",
         }
       : {
-          title: "Teil unseres Creator-Netzwerks werden",
-          intro: "Kurz bewerben – wir melden uns, wenn es passt.",
+          title: "Werde Teil unseres Creator-Netzwerks",
+          intro: "Erzähle uns von dir – wir freuen uns Dich kennenzulernen.",
         };
 
   return (
