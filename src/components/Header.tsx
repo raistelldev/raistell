@@ -109,8 +109,8 @@ export function Header() {
   return (
     <header className="header-facet sticky top-0 z-50 border-b border-line">
       <div className="relative mx-auto max-w-6xl px-4">
-        <div className="relative flex h-16 items-center justify-center md:hidden">
-          <Logo variant="stacked" className="text-ink" />
+        <div className="flex h-16 items-center justify-between md:hidden">
+          <Logo />
 
           <button
             type="button"
@@ -118,7 +118,7 @@ export function Header() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Menü schließen" : "Menü öffnen"}
-            className="absolute right-0 inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-surface/50"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-surface/50"
           >
             {open ? (
               <CloseIcon className="h-6 w-6" />
@@ -129,7 +129,7 @@ export function Header() {
         </div>
 
         <div className="hidden h-16 items-center justify-between md:flex">
-          <Logo variant="inline" className="text-ink" />
+          <Logo />
           <nav aria-label="Hauptnavigation">
             <ul className="flex items-center gap-0.5">
               {navItems.map((item) => (

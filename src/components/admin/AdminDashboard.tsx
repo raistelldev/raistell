@@ -611,7 +611,7 @@ export function AdminDashboard() {
           )}
         </section>
       ) : (
-        <section className="mt-6 max-w-xl">
+        <section className="mt-6 max-w-2xl">
           {!impressum ? (
             <p className="text-sm text-ink-soft">Lädt …</p>
           ) : (
@@ -619,38 +619,21 @@ export function AdminDashboard() {
               onSubmit={(e) => void saveImpressum(e)}
               className="space-y-4 rounded-theme border border-line bg-surface p-5 sm:p-6"
             >
-              <Field
-                label="Anbieter / Name"
-                value={impressum.providerName}
-                onChange={(v) =>
-                  setImpressum({ ...impressum, providerName: v })
-                }
-              />
-              <Field
-                label="Straße"
-                value={impressum.street}
-                onChange={(v) => setImpressum({ ...impressum, street: v })}
-              />
-              <Field
-                label="PLZ und Ort"
-                value={impressum.city}
-                onChange={(v) => setImpressum({ ...impressum, city: v })}
-              />
-              <Field
-                label="Land"
-                value={impressum.country}
-                onChange={(v) => setImpressum({ ...impressum, country: v })}
-              />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field
-                  label="E-Mail"
-                  value={impressum.email}
-                  onChange={(v) => setImpressum({ ...impressum, email: v })}
-                />
-                <Field
-                  label="Telefon"
-                  value={impressum.phone}
-                  onChange={(v) => setImpressum({ ...impressum, phone: v })}
+              <div>
+                <label
+                  htmlFor="impressum-text"
+                  className="mb-1.5 block text-sm font-medium text-ink"
+                >
+                  Impressum-Text
+                </label>
+                <textarea
+                  id="impressum-text"
+                  value={impressum.text}
+                  onChange={(e) =>
+                    setImpressum({ ...impressum, text: e.target.value })
+                  }
+                  rows={16}
+                  className="w-full resize-y rounded-theme border border-line bg-page px-3 py-2.5 font-mono text-sm leading-relaxed text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft"
                 />
               </div>
 
@@ -807,24 +790,3 @@ function ExportButton({
   );
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-ink">{label}</label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-theme border border-line bg-page px-3 py-2.5 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft"
-      />
-    </div>
-  );
-}

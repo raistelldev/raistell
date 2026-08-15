@@ -47,15 +47,17 @@ export const navByAudience: Record<Audience, NavItem[]> = {
     { label: "Start", href: "#start" },
     { label: "Warum", href: "#problem" },
     { label: "Ablauf", href: "#ablauf" },
-    { label: "FAQ", href: "#faq" },
     { label: "Kontakt", href: "#kontakt" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Über uns", href: "#ueber-uns" },
   ],
   creator: [
     { label: "Start", href: "#start" },
     { label: "Lösung", href: "#loesung" },
     { label: "Ablauf", href: "#ablauf" },
-    { label: "FAQ", href: "#faq" },
     { label: "Kontakt", href: "#kontakt" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Über uns", href: "#ueber-uns" },
   ],
 };
 
@@ -161,29 +163,6 @@ export const companyFunnel = {
       "Strukturierte Projektabwicklung",
       "Ein laufender Ansprechpartner",
     ],
-  },
-  founding: {
-    eyebrow: "Warum wir Raistell gegründet haben",
-    title: "Weil Unternehmen und Creator oft nicht zusammenfinden.",
-    text: "Während meiner Arbeit im Vertrieb der Energiewende fiel mir immer wieder auf, dass Unternehmen und Creator oft nicht zusammenfinden – obwohl beide voneinander profitieren könnten. Genau daraus entstand Raistell.",
-    name: {
-      title: "Woher der Name kommt",
-      intro: "Ein Name, inspiriert von Verbindung über Distanz.",
-      parts: [
-        {
-          n: "01",
-          title: "Raisting",
-          text: "Ein deutscher Ort mit besonderer Geschichte in der Satellitenkommunikation. Dort wurde Deutschlands erste kommerziell betriebene Satelliten-Bodenstation errichtet.",
-        },
-        {
-          n: "02",
-          title: "Telstar",
-          text: "Ein früher Kommunikationssatellit, der Fernsehsignale zwischen Europa und Nordamerika übertrug. Seine Oberfläche war mit Solarzellen bedeckt.",
-        },
-      ],
-      closing:
-        "Aus Raisting und Telstar entstand Raistell. Die Idee dahinter bleibt bis heute dieselbe: Verbindungen schaffen, die ohne den richtigen Partner nicht entstehen würden.",
-    },
   },
   faq: {
     eyebrow: "",
@@ -335,6 +314,41 @@ export const creatorFunnel = {
   closing: {
     title: "Teil unseres Creator-Netzwerks werden",
     text: "Bewirb dich unverbindlich – wir melden uns, wenn es passt.",
+  },
+} as const;
+
+/* ---------- Über uns (beide Funnels) ---------- */
+
+export const about = {
+  eyebrow: "Über uns",
+  title: "Wir bringen zusammen, was wirklich zueinander passt.",
+  paragraphs: [
+    "Die Idee zu Raistell entstand aus praktischer Erfahrung im Vertrieb der Energiewende. Dabei wurde immer wieder deutlich: Unternehmen haben viel zu erklären, Creator besitzen das Vertrauen ihrer Community – doch beide finden oft nicht auf eine Weise zusammen, die wirklich passt.",
+    "Unsere Arbeit beginnt deshalb mit Zuhören. Wir möchten verstehen, welches Ziel ein Unternehmen verfolgt, wofür ein Creator steht und ob Thema, Region, Community und Zusammenarbeit wirklich zusammenpassen. Erst dann empfehlen wir eine Verbindung.",
+    "Von der sorgfältigen Auswahl über Briefing, Verträge und Abstimmungen bis zur Veröffentlichung begleiten wir jedes Projekt persönlich und verlässlich. Unternehmen erhalten Orientierung und einen festen Ansprechpartner. Creator erhalten passende Anfragen, transparente Bedingungen und den Freiraum, glaubwürdig zu bleiben.",
+    "Unser Anspruch ist nicht, möglichst viele Verbindungen herzustellen. Sondern die richtigen – damit gute Lösungen verständlich werden, Partnerschaften fair bleiben und Vertrauen wachsen kann.",
+  ],
+  name: {
+    title: "Wie der Name Raistell entstand",
+    intro: "Ein Name, inspiriert von Verbindung über Distanz.",
+    lead: "Bei der Suche nach einem Namen wollten wir kein beliebiges Kunstwort. Der Name sollte die Aufgabe von Raistell in sich tragen: die richtigen Menschen so miteinander zu verbinden, dass aus einem Kontakt eine vertrauensvolle Zusammenarbeit entstehen kann.",
+    inspiration:
+      "Die Inspiration dafür fanden wir in der Geschichte der Satellitenkommunikation.",
+    parts: [
+      {
+        title: "Raisting",
+        text: "Raisting ist ein deutscher Ort mit einer besonderen Rolle in dieser Geschichte. Dort wurde Deutschlands erste kommerziell betriebene Satelliten-Bodenstation errichtet – geschaffen, um Signale über große Entfernungen zu empfangen und Menschen einander näherzubringen.",
+      },
+      {
+        title: "Telstar",
+        text: "Telstar war ein früher Kommunikationssatellit, der Fernsehsignale zwischen Europa und Nordamerika übertrug. Selbst seine Oberfläche trug ein Detail, das beinahe wie eine leise Verbindung zu unserer heutigen Arbeit wirkt: Sie war mit Solarzellen bedeckt.",
+      },
+    ],
+    formed: "Aus Raisting und Telstar entstand Raistell.",
+    meaning:
+      "Was damals Signale über Kontinente hinweg verband, steht heute sinnbildlich für unsere Arbeit: Unternehmen der Energiewende und glaubwürdige Creator sollen sich nicht nur finden, sondern wirklich zueinander passen.",
+    closer: "Denn die richtige Verbindung kann mehr schaffen als Aufmerksamkeit.",
+    tagline: "Aus Vertrauen wird Wirkung.",
   },
 } as const;
 

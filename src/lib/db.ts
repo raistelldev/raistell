@@ -139,38 +139,65 @@ export async function deleteLeadsByIds(ids: string[]) {
 }
 
 export type ImpressumData = {
-  providerName: string;
-  street: string;
-  city: string;
-  country: string;
-  phone: string;
-  email: string;
+  text: string;
 };
 
 export function defaultImpressum(): ImpressumData {
-  return {
-    providerName: site.legal.providerName,
-    street: site.legal.street,
-    city: site.legal.city,
-    country: site.legal.country,
-    phone: site.contact.phone,
-    email: site.contact.email,
-  };
+  const lines = [
+    "Diensteanbieter",
+    "",
+    site.legal.providerName,
+    site.legal.street,
+    site.legal.city,
+    site.legal.country,
+    "",
+    "Kontakt",
+    "",
+    `E-Mail: ${site.contact.email}`,
+  ];
+  if (site.contact.phone) {
+    lines.push(`Telefon: ${site.contact.phone}`);
+  }
+  return { text: lines.join("\n") };
 }
 
 function normalizeImpressum(raw: unknown): ImpressumData {
   const base = defaultImpressum();
   if (!raw || typeof raw !== "object") return base;
-  const data = raw as Partial<ImpressumData>;
+  const data = raw as Record<string, unknown>;
 
-  return {
-    providerName: String(data.providerName ?? base.providerName),
-    street: String(data.street ?? base.street),
-    city: String(data.city ?? base.city),
-    country: String(data.country ?? base.country),
-    phone: String(data.phone ?? base.phone),
-    email: String(data.email ?? base.email),
-  };
+  if (typeof data.text === "string") {
+    return { text: data.text };
+  }
+
+  // Altes strukturiertes Format → Freitext
+  const providerName = String(data.providerName ?? "");
+  const street = String(data.street ?? "");
+  const city = String(data.city ?? "");
+  const country = String(data.country ?? "");
+  const email = String(data.email ?? "");
+  const phone = String(data.phone ?? "");
+  if (providerName || street || city || country || email || phone) {
+    return {
+      text: [
+        "Diensteanbieter",
+        "",
+        providerName,
+        street,
+        city,
+        country,
+        "",
+        "Kontakt",
+        "",
+        email ? `E-Mail: ${email}` : null,
+        phone ? `Telefon: ${phone}` : null,
+      ]
+        .filter((line): line is string => line !== null)
+        .join("\n"),
+    };
+  }
+
+  return base;
 }
 
 export async function getImpressum() {

@@ -37,18 +37,22 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
+        url: "/og.png",
+        width: 1200,
+        height: 630,
         alt: site.name,
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description,
-    images: ["/logo.png"],
+    images: ["/og.png"],
+  },
+  icons: {
+    icon: [{ url: "/favicon-32.png", sizes: "32x32", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   robots: {
     index: true,

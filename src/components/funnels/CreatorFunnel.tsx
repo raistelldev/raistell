@@ -1,6 +1,5 @@
 import { Section, SectionHeading } from "@/components/Section";
-import { Faq } from "@/components/sections/Faq";
-import { companyFunnel, creatorFunnel } from "@/config/site";
+import { creatorFunnel } from "@/config/site";
 
 function CheckIcon({ className = "" }: { className?: string }) {
   return (
@@ -18,7 +17,6 @@ function CheckIcon({ className = "" }: { className?: string }) {
 
 export function CreatorFunnel() {
   const f = creatorFunnel;
-  const founding = companyFunnel.founding;
 
   return (
     <>
@@ -49,14 +47,28 @@ export function CreatorFunnel() {
           eyebrow={f.whyRaistell.eyebrow}
           title={f.whyRaistell.title}
         />
-        <ul className="mt-10 max-w-2xl space-y-4">
-          {f.whyRaistell.points.map((point) => (
-            <li key={point} className="flex items-start gap-3 text-base text-ink">
-              <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
-              {point}
-            </li>
-          ))}
-        </ul>
+        <ol className="mt-12 max-w-2xl">
+          {f.whyRaistell.points.map((point, i) => {
+            const last = i === f.whyRaistell.points.length - 1;
+            return (
+              <li key={point} className="flex gap-4">
+                <div className="flex w-4 shrink-0 flex-col items-center" aria-hidden>
+                  <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-brand ring-4 ring-brand-soft" />
+                  {!last && (
+                    <span className="mt-1 w-px flex-1 bg-gradient-to-b from-brand/50 to-brand/15" />
+                  )}
+                </div>
+                <p
+                  className={`font-brand text-xl font-semibold leading-snug text-ink ${
+                    last ? "pb-0" : "pb-8"
+                  }`}
+                >
+                  {point}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
       </Section>
 
       <Section id="ablauf" tone="alt">
@@ -89,46 +101,6 @@ export function CreatorFunnel() {
           ))}
         </ul>
       </Section>
-
-      <Section id="geschichte" tone="dark">
-        <SectionHeading
-          eyebrow={founding.eyebrow}
-          title={founding.title}
-          intro={founding.text}
-          onDark
-        />
-
-        <div className="mt-16 border-t border-on-dark/20 pt-12">
-          <p className="text-sm font-semibold uppercase tracking-widest text-on-dark/75">
-            {founding.name.title}
-          </p>
-          <h3 className="mt-4 max-w-2xl font-brand text-2xl font-semibold tracking-tight text-on-dark sm:text-3xl">
-            {founding.name.intro}
-          </h3>
-          <div className="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
-            {founding.name.parts.map((part) => (
-              <div key={part.title} className="border-t border-on-dark/20 pt-6">
-                <h4 className="font-brand text-xl font-semibold text-on-dark">
-                  {part.title}
-                </h4>
-                <p className="mt-3 text-sm leading-relaxed text-on-dark/80">
-                  {part.text}
-                </p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-12 max-w-3xl text-base leading-relaxed text-on-dark/85">
-            {founding.name.closing}
-          </p>
-        </div>
-      </Section>
-
-      <Faq
-        eyebrow={f.faq.eyebrow}
-        title={f.faq.title}
-        items={f.faq.items}
-        tone="alt"
-      />
     </>
   );
 }

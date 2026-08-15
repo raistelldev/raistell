@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import {
-  getImpressum,
-  saveImpressum,
-  type ImpressumData,
-} from "@/lib/db";
+import { getImpressum, saveImpressum } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -30,25 +26,22 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: Partial<ImpressumData>;
+  let body: { text?: unknown };
   try {
-    body = (await request.json()) as Partial<ImpressumData>;
+    body = (await request.json()) as { text?: unknown };
   } catch {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
   }
 
-  try {
-    const current = await getImpressum();
-    const next: ImpressumData = {
-      providerName: String(body.providerName ?? current.providerName),
-      street: String(body.street ?? current.street),
-      city: String(body.city ?? current.city),
-      country: String(body.country ?? current.country),
-      phone: String(body.phone ?? current.phone),
-      email: String(body.email ?? current.email),
-    };
+  if (typeof body.text !== "string") {
+    return NextResponse.json(
+      { error: "Text ist erforderlich." },
+      { status: 400 },
+    );
+  }
 
-    const impressum = await saveImpressum(next);
+  try {
+    const impressum = await saveImpressum({ text: body.text });
     return NextResponse.json({ ok: true, impressum });
   } catch (error) {
     console.error("[api/admin/impressum PUT]", error);

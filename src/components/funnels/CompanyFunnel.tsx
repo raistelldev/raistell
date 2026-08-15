@@ -1,5 +1,4 @@
 import { Section, SectionHeading } from "@/components/Section";
-import { Faq } from "@/components/sections/Faq";
 import { companyFunnel } from "@/config/site";
 
 function CheckIcon({ className = "" }: { className?: string }) {
@@ -144,47 +143,6 @@ export function CompanyFunnel() {
           ))}
         </ul>
       </Section>
-
-      {/* Gründung + Name */}
-      <Section id="geschichte" tone="dark">
-        <SectionHeading
-          eyebrow={f.founding.eyebrow}
-          title={f.founding.title}
-          intro={f.founding.text}
-          onDark
-        />
-
-        <div className="mt-16 border-t border-on-dark/20 pt-12">
-          <p className="text-sm font-semibold uppercase tracking-widest text-on-dark/75">
-            {f.founding.name.title}
-          </p>
-          <h3 className="mt-4 max-w-2xl font-brand text-2xl font-semibold tracking-tight text-on-dark sm:text-3xl">
-            {f.founding.name.intro}
-          </h3>
-          <div className="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
-            {f.founding.name.parts.map((part) => (
-              <div key={part.title} className="border-t border-on-dark/20 pt-6">
-                <h4 className="font-brand text-xl font-semibold text-on-dark">
-                  {part.title}
-                </h4>
-                <p className="mt-3 text-sm leading-relaxed text-on-dark/80">
-                  {part.text}
-                </p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-12 max-w-3xl text-base leading-relaxed text-on-dark/85">
-            {f.founding.name.closing}
-          </p>
-        </div>
-      </Section>
-
-      <Faq
-        eyebrow={f.faq.eyebrow}
-        title={f.faq.title}
-        items={f.faq.items}
-        tone="light"
-      />
     </>
   );
 }
