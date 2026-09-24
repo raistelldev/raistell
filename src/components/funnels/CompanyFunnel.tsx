@@ -1,147 +1,36 @@
 import { Section, SectionHeading } from "@/components/Section";
 import { companyFunnel } from "@/config/site";
 
-function CheckIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
-      <path
-        d="M20 6L9 17l-5-5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export function CompanyFunnel() {
   const f = companyFunnel;
-
   return (
     <>
-      {/* Problem */}
-      <Section id="problem" tone="light">
-        <SectionHeading eyebrow={f.problem.eyebrow} title={f.problem.title} />
-        <ul className="mt-10 max-w-2xl space-y-5">
-          {f.problem.points.map((point) => (
-            <li key={point} className="flex items-start gap-3 text-base text-ink sm:text-lg">
-              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" aria-hidden />
-              {point}
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      {/* Warum Creator */}
-      <Section id="warum-creator" tone="alt">
-        <SectionHeading
-          eyebrow={f.whyCreators.eyebrow}
-          title={f.whyCreators.title}
-        />
-        <div className="mt-12 grid gap-8 md:grid-cols-2">
-          <div className="border-t-2 border-line pt-6">
-            <p className="text-sm font-semibold uppercase tracking-widest text-ink-soft">
-              {f.whyCreators.ad.label}
-            </p>
-            <p className="mt-4 font-brand text-2xl font-semibold text-ink-soft sm:text-3xl">
-              {f.whyCreators.ad.text}
-            </p>
+      <Section id="pilot" tone="light">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <SectionHeading eyebrow={f.pilot.eyebrow} title={f.pilot.title} intro={f.pilot.intro} />
+            <p className="mt-6 text-sm leading-relaxed text-ink-soft">Für Unternehmen aus Photovoltaik, Wärmepumpe und Smart Energy, die ein Projekt zeigen können und ihre Inhalte gezielt einsetzen möchten.</p>
+            <a href="#kontakt" className="mt-8 inline-flex items-center gap-5 rounded-theme bg-brand px-6 py-3.5 text-sm font-semibold text-on-brand hover:bg-brand-strong">Pilotprojekt anfragen <span aria-hidden="true">↗</span></a>
           </div>
-          <div className="border-t-2 border-brand pt-6">
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand">
-              {f.whyCreators.creator.label}
-            </p>
-            <p className="mt-4 font-brand text-2xl font-semibold text-ink sm:text-3xl">
-              {f.whyCreators.creator.text}
-            </p>
+          <div className="rounded-xl border border-line bg-surface p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand">Das ist enthalten</p>
+            <ul className="mt-6 divide-y divide-line">{f.pilot.points.map((point) => <li key={point} className="flex gap-3 py-4 text-sm leading-relaxed first:pt-0"><span aria-hidden="true" className="font-semibold text-brand">✓</span>{point}</li>)}</ul>
+            <p className="mt-5 border-t border-line pt-5 text-xs leading-relaxed text-ink-soft">{f.pilot.scope}</p>
           </div>
         </div>
+        <div className="mt-12 grid gap-4 border-y border-line py-6 md:grid-cols-[0.8fr_1.2fr] md:gap-12"><p className="text-lg font-semibold leading-snug text-ink">{f.pilot.budgetTitle}</p><p className="text-sm leading-relaxed text-ink-soft">{f.pilot.budgetText}</p></div>
       </Section>
-
-      {/* Warum Raistell */}
-      <Section id="warum-raistell" tone="light">
-        <SectionHeading
-          eyebrow={f.whyRaistell.eyebrow}
-          title={f.whyRaistell.title}
-        />
-
-        {/* Mobile: vertikale Prozess-Schiene */}
-        <ol className="mt-12 md:hidden">
-          {f.whyRaistell.points.map((point, i) => {
-            const last = i === f.whyRaistell.points.length - 1;
-            return (
-              <li key={point} className="flex gap-4">
-                <div className="flex w-4 shrink-0 flex-col items-center" aria-hidden>
-                  <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-brand ring-4 ring-brand-soft" />
-                  {!last && (
-                    <span className="mt-1 w-px flex-1 bg-gradient-to-b from-brand/50 to-brand/15" />
-                  )}
-                </div>
-                <p
-                  className={`font-brand text-xl font-semibold leading-snug text-ink ${
-                    last ? "pb-0" : "pb-8"
-                  }`}
-                >
-                  {point}
-                </p>
-              </li>
-            );
-          })}
-        </ol>
-
-        {/* Desktop: horizontale Prozesskette */}
-        <ol className="mt-16 hidden grid-cols-5 gap-0 md:grid">
-          {f.whyRaistell.points.map((point, i) => {
-            const last = i === f.whyRaistell.points.length - 1;
-            return (
-              <li key={point} className="relative px-3 first:pl-0 last:pr-0">
-                <div className="flex items-center" aria-hidden>
-                  <span className="h-3 w-3 shrink-0 rounded-full bg-brand ring-4 ring-brand-soft" />
-                  {!last && (
-                    <span className="mx-2 h-px min-w-0 flex-1 bg-gradient-to-r from-brand/55 to-brand/20" />
-                  )}
-                </div>
-                <p className="mt-5 font-brand text-lg font-semibold leading-snug text-ink lg:text-xl">
-                  {point}
-                </p>
-              </li>
-            );
-          })}
-        </ol>
+      <Section id="einsatz" tone="alt">
+        <SectionHeading eyebrow="Ein Video mit einer Aufgabe" title="Dort einsetzen, wo Kunden Fragen haben." />
+        <div className="mt-10 grid gap-8 md:grid-cols-3">{f.uses.map((use, i) => <article key={use.title} className="border-t border-brand/25 pt-6"><span className="text-sm font-semibold text-brand">0{i + 1}</span><h3 className="mt-4 text-xl font-semibold">{use.title}</h3><p className="mt-3 text-sm leading-relaxed text-ink-soft">{use.text}</p><p className="mt-5 text-xs font-semibold text-brand">{use.channel}</p></article>)}</div>
       </Section>
-
-      {/* Ablauf */}
+      <Section id="leistungen" tone="light">
+        <SectionHeading eyebrow="Klar getrennte Leistungen" title="Welche Inhalte Sie erhalten. Wo sie erscheinen." intro="Content-Produktion, Creator-Reichweite und Werbeausspielung erfüllen unterschiedliche Aufgaben. Wir klären vorab, was Ihr Projekt braucht." />
+        <div className="mt-10 grid gap-4 lg:grid-cols-3">{f.services.map((service, i) => <article key={service.number} className={`flex flex-col rounded-xl border p-6 sm:p-7 ${i === 0 ? "border-brand/30 bg-surface-alt" : "border-line bg-surface"}`}><div className="flex items-center justify-between gap-4 text-xs font-semibold text-brand"><span>{service.number}</span><span>{service.label}</span></div><h3 className="mt-7 text-2xl font-semibold leading-tight">{service.title}</h3><p className="mb-7 mt-4 text-sm leading-relaxed text-ink-soft">{service.text}</p><p className="mt-auto border-t border-ink/10 pt-4 text-xs leading-relaxed text-ink">{service.detail}</p></article>)}</div>
+      </Section>
       <Section id="ablauf" tone="alt">
-        <SectionHeading title={f.process.title} />
-        <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {f.process.steps.map((step) => (
-            <li key={step.n} className="border-t border-line pt-5">
-              <span className="font-brand text-sm font-semibold tracking-widest text-brand">
-                {step.n}
-              </span>
-              <h3 className="mt-4 font-brand text-xl font-semibold text-ink">
-                {step.title}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-                {step.text}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </Section>
-
-      {/* Vertrauen */}
-      <Section id="vertrauen" tone="light">
-        <SectionHeading eyebrow={f.trust.eyebrow} title={f.trust.title} />
-        <ul className="mt-10 max-w-2xl space-y-4">
-          {f.trust.points.map((point) => (
-            <li key={point} className="flex items-start gap-3 text-base text-ink">
-              <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
-              {point}
-            </li>
-          ))}
-        </ul>
+        <SectionHeading eyebrow="So arbeiten wir zusammen" title={f.process.title} />
+        <ol className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">{f.process.steps.map((step) => <li key={step.n} className="border-t border-brand/25 pt-5"><span className="text-sm font-semibold tracking-widest text-brand">{step.n}</span><h3 className="mt-4 text-xl font-semibold">{step.title}</h3><p className="mt-3 text-sm leading-relaxed text-ink-soft">{step.text}</p></li>)}</ol>
       </Section>
     </>
   );
