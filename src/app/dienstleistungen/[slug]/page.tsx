@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ServiceIcon } from "@/components/ServiceIcon";
@@ -47,7 +48,7 @@ export default async function ServiceDetailPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 md:py-24">
-      <a
+      <Link
         href="/#ablauf"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-strong"
       >
@@ -55,7 +56,7 @@ export default async function ServiceDetailPage({
           <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         Zum Ablauf
-      </a>
+      </Link>
 
       <div className="mt-10">
         <div className="flex items-center gap-3">
@@ -92,12 +93,12 @@ export default async function ServiceDetailPage({
           Lassen Sie uns unverbindlich sprechen – wir melden uns mit einem
           passenden Vorschlag.
         </p>
-        <a
+        <Link
           href="/?role=firma#kontakt"
           className="mt-6 inline-flex rounded-theme bg-on-brand px-6 py-3 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft"
         >
-          Kostenloses Erstgespräch vereinbaren
-        </a>
+          Projekt besprechen
+        </Link>
       </div>
 
     </main>
