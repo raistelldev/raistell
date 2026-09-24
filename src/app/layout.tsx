@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 const siteUrl = getSiteUrl();
-const title = `${site.name} – Authentische Creator für die Energiewende`;
+const title = `${site.name} – Creator-Videos für die Energiewende`;
 const description = companyFunnel.hero.subtitle;
 
 export const metadata: Metadata = {

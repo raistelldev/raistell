@@ -93,6 +93,15 @@ body {
   touch-action: manipulation;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 /* Header: Gebäude-Foto + leichte Wash */
 .header-facet {
   background-color: var(--color-page);
