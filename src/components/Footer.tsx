@@ -25,7 +25,7 @@ export function Footer() {
           <div>
             <Logo onDark />
             <p className="mt-4 max-w-xs text-sm text-on-dark/75">
-              Creator-Kooperationen für Unternehmen der Energiewende –
+              Creator-Videos für echte Energieprojekte –
               Photovoltaik, Wärmepumpe und Smart Energy.
             </p>
           </div>

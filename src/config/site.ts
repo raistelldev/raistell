@@ -29,13 +29,13 @@ export type NavItem = { label: string; href: string };
 /** Die zwei zentralen CTAs. */
 export const ctas = {
   company: {
-    label: "Kostenloses Erstgespräch vereinbaren",
-    shortLabel: "Erstgespräch vereinbaren",
+    label: "Pilotprojekt besprechen",
+    shortLabel: "Projekt besprechen",
     href: "/?role=firma#kontakt",
     role: "firma" as const,
   },
   creator: {
-    label: "Netzwerk beitreten",
+    label: "Als Creator bewerben",
     finalLabel: "Teil unseres Creator-Netzwerks werden",
     href: "/?role=creator#kontakt",
     role: "creator" as const,
@@ -45,9 +45,9 @@ export const ctas = {
 export const navByAudience: Record<Audience, NavItem[]> = {
   firma: [
     { label: "Start", href: "#start" },
-    { label: "Warum", href: "#problem" },
+    { label: "Pilotangebot", href: "#pilot" },
+    { label: "Leistungen", href: "#leistungen" },
     { label: "Ablauf", href: "#ablauf" },
-    { label: "Kontakt", href: "#kontakt" },
     { label: "FAQ", href: "#faq" },
     { label: "Über uns", href: "#ueber-uns" },
   ],
@@ -73,10 +73,11 @@ export const formOptions = {
     "über 100.000",
   ] as const,
   seeking: [
-    "Einmalige Creator-Kooperation",
-    "Langfristige Creator-Zusammenarbeit",
-    "Projektbegleitung mit Content",
-    "Ich bin noch unsicher / Beratung",
+    "Website und Verkaufsgespräche",
+    "Eigene Social-Media-Kanäle",
+    "Bezahlte Werbung",
+    "Veröffentlichung beim Creator",
+    "Noch offen / Beratung gewünscht",
   ] as const,
   budgets: [
     "Noch offen / Beratung gewünscht",
@@ -90,118 +91,125 @@ export const formOptions = {
 /* ---------- Funnel: Unternehmen ---------- */
 
 export const companyFunnel = {
-  hero: {
-    eyebrow: "Für Unternehmen der Energiewende",
-    title: "Authentische Creator für Photovoltaik, Wärmepumpe und Smart Energy.",
-    subtitle:
-      "Wir verbinden Unternehmen aus den Bereichen Photovoltaik, Wärmepumpe und Smart Energy mit sorgfältig ausgewählten Creatorn, die Vertrauen schaffen und Ihre Produkte verständlich präsentieren.",
+  "hero": {
+    "eyebrow": "Creator-Inhalte für PV, Wärmepumpe und Smart Energy",
+    "title": "Machen Sie Ihre Energieprojekte verständlich.",
+    "subtitle": "Raistell entwickelt mit passenden Creatorn Videos aus echten Projekten – für Ihre Website, Werbung und Verkaufsgespräche. Ein klares Thema. Ein abgestimmter Umfang. Ein fester Ansprechpartner."
   },
-  problem: {
-    eyebrow: "Das Problem",
-    title: "Gute Produkte allein reichen heute nicht mehr.",
-    points: [
-      "Menschen kaufen dort, wo Vertrauen entsteht.",
-      "Klassische Werbung wird zunehmend ignoriert.",
-      "Authentische Creator können komplexe Produkte verständlich erklären.",
+  "pilot": {
+    "eyebrow": "Das Pilotangebot",
+    "title": "Ein echtes Projekt. Vier Videos mit klarer Aufgabe.",
+    "intro": "Beginnen Sie mit einer Frage, die Ihre Interessenten vor der Entscheidung beschäftigt. Wir machen daraus Inhalte, die Sie im Alltag Ihres Unternehmens einsetzen können.",
+    "points": [
+      "Ein Briefing zu Zielgruppe, Thema und Einsatz",
+      "Auswahl und Koordination eines passenden Creators",
+      "Ein Hauptvideo und drei daraus geschnittene Kurzvideos",
+      "Eine gebündelte Korrekturrunde zum vereinbarten Briefing",
+      "Übergabe der freigegebenen Dateien in den vereinbarten Formaten"
     ],
+    "scope": "Ein Projekt als Ausgangspunkt. Videolängen, Drehort, Anreise, Formate und Nutzungsrechte legen wir im Angebot fest. Zusätzliche Drehs, Varianten und Veröffentlichungen werden separat vereinbart.",
+    "budgetTitle": "Sie kennen den Umfang und die Gesamtkosten vor dem Start.",
+    "budgetText": "Das Angebot weist Raistells Leistung sowie Produktion, Creator-Honorar und vereinbarte Nutzungsrechte nachvollziehbar aus. Ein mögliches Werbebudget betrachten wir separat."
   },
-  whyCreators: {
-    eyebrow: "Warum Creator?",
-    title: "Werbebanner verkaufen. Creator schaffen Vertrauen.",
-    ad: {
-      label: "Ein Banner sagt:",
-      text: "„Kauf dieses Produkt.“",
+  "uses": [
+    {
+      "title": "Vor der Beratung",
+      "text": "Beantworten Sie wiederkehrende Fragen schon vor dem ersten Gespräch.",
+      "channel": "Website & Terminvorbereitung"
     },
-    creator: {
-      label: "Ein Creator sagt:",
-      text: "„Lass mich dir zeigen, warum.“",
+    {
+      "title": "Nach dem Angebot",
+      "text": "Zeigen Sie Interessenten, wie die Umsetzung bei einem echten Kunden aussieht.",
+      "channel": "Vertrieb & Angebotsnachfassung"
     },
+    {
+      "title": "In Ihrer Werbung",
+      "text": "Nutzen Sie verständliche Videoausschnitte in bestehenden Kampagnen – mit den passenden Rechten.",
+      "channel": "Social Media & Anzeigen"
+    }
+  ],
+  "services": [
+    {
+      "number": "01",
+      "label": "Die Basis",
+      "title": "Inhalte für Ihr Unternehmen",
+      "text": "Ein Creator erklärt Ihr Projekt oder stellt Fragen an Kunden und Fachleute. Sie erhalten die vereinbarten Videos für Ihre eigenen Kanäle.",
+      "detail": "Kanäle, Formate und Nutzungszeitraum stehen im Angebot."
+    },
+    {
+      "number": "02",
+      "label": "Optional ergänzen",
+      "title": "Veröffentlichung beim Creator",
+      "text": "Soll der Inhalt auch auf dem Creator-Profil erscheinen, prüfen wir die tatsächliche Zielgruppe und vereinbaren die Veröffentlichung gesondert.",
+      "detail": "Für regionale Projekte zählt die Region des Publikums."
+    },
+    {
+      "number": "03",
+      "label": "Den Einsatz mitdenken",
+      "title": "Videos für bezahlte Werbung",
+      "text": "Wir berücksichtigen die geplante Werbenutzung bei Inhalt, Format und Rechten. Ihre Anzeigen schalten Sie oder Ihre betreuende Agentur.",
+      "detail": "Werbebudget und Anzeigenbetreuung sind nicht automatisch enthalten."
+    }
+  ],
+  "process": {
+    "title": "Von der ersten Frage zum einsetzbaren Video.",
+    "steps": [
+      {
+        "n": "01",
+        "title": "Ziel klären",
+        "text": "Wen möchten Sie erreichen? Welches Projekt können Sie zeigen? Wo sollen die Inhalte eingesetzt werden?"
+      },
+      {
+        "n": "02",
+        "title": "Umfang abstimmen",
+        "text": "Sie erhalten einen Vorschlag für Inhalt und Creator sowie ein Angebot mit den Gesamtkosten."
+      },
+      {
+        "n": "03",
+        "title": "Produzieren & freigeben",
+        "text": "Wir koordinieren die Produktion. Sie prüfen die fachlichen Angaben und geben gebündeltes Feedback."
+      },
+      {
+        "n": "04",
+        "title": "Einsetzen & weiterdenken",
+        "text": "Sie erhalten die freigegebenen Dateien. Wir besprechen den Einsatz und mögliche nächste Themen."
+      }
+    ]
   },
-  whyRaistell: {
-    eyebrow: "Warum Raistell?",
-    title: "Wir übernehmen den gesamten Prozess.",
-    points: [
-      "Passende Creator finden",
-      "Briefing",
-      "Vertragsabwicklung",
-      "Projektkoordination",
-      "Qualitätssicherung",
-    ],
-  },
-  process: {
-    title: "In vier einfachen Schritten zur Creator-Kooperation.",
-    steps: [
+  "faq": {
+    "eyebrow": "Gut zu wissen",
+    "title": "Ihre Fragen vor dem ersten Projekt.",
+    "items": [
       {
-        n: "01",
-        title: "Erstgespräch",
-        text: "Wir lernen Ihr Unternehmen, Ihre Ziele und Ihr Projekt kennen.",
+        "q": "Für welche Unternehmen eignet sich das Pilotangebot?",
+        "a": "Für Unternehmen aus Photovoltaik, Wärmepumpe und Smart Energy, die ihre Lösungen an einem konkreten Projekt erklären möchten. Ein guter Ausgangspunkt sind ein vorzeigbares Projekt, die erforderlichen Einverständnisse der Mitwirkenden und ein geplanter Einsatz für die Videos."
       },
       {
-        n: "02",
-        title: "Creator Matching",
-        text: "Wir wählen einen passenden Creator aus unserem Netzwerk aus.",
+        "q": "Was kostet ein Pilotprojekt?",
+        "a": "Produktion, Mitwirkende, Drehort und Nutzungsrechte bestimmen das Budget. Nach dem ersten Gespräch erhalten Sie ein Angebot mit dem konkreten Umfang und den Gesamtkosten. Creator-Honorar, zusätzliche Leistungen und ein mögliches Werbebudget werden transparent abgegrenzt."
       },
       {
-        n: "03",
-        title: "Content-Produktion",
-        text: "Wir koordinieren Briefing, Abstimmung und Produktion bis zur Freigabe.",
+        "q": "Müssen wir ein fertiges Konzept mitbringen?",
+        "a": "Nein. Hilfreich sind ein geeignetes Projekt und Fragen, die Ihre Interessenten häufig stellen. Daraus entwickeln wir das Thema und stimmen den Umfang ab."
       },
       {
-        n: "04",
-        title: "Veröffentlichung",
-        text: "Der Content geht live und Sie erhalten die vereinbarten Ergebnisse.",
-      },
-    ],
-  },
-  trust: {
-    eyebrow: "Warum uns vertrauen?",
-    title: "Klarer Fokus. Saubere Abläufe.",
-    points: [
-      "Fokus auf die Energiewende",
-      "Regional passende Creator",
-      "Standardisierte Briefings",
-      "Strukturierte Projektabwicklung",
-      "Ein laufender Ansprechpartner",
-    ],
-  },
-  faq: {
-    eyebrow: "",
-    title: "FAQ",
-    items: [
-      {
-        q: "Was kostet eine Zusammenarbeit?",
-        a: "Die Kosten richten sich nach dem Umfang des Projekts sowie dem ausgewählten Creator. Im kostenlosen Erstgespräch besprechen wir Ihre Ziele und erstellen eine individuelle Empfehlung.",
+        "q": "Veröffentlicht der Creator die Videos auf seinem Profil?",
+        "a": "Nur wenn es ausdrücklich vereinbart ist. Für eine Veröffentlichung prüfen wir zusätzlich, ob das Publikum des Creators zur Zielgruppe und gegebenenfalls zur Region passt. Die Produktion für Ihre eigenen Kanäle kann unabhängig davon beauftragt werden."
       },
       {
-        q: "Wie werden Creator ausgewählt?",
-        a: "Jeder Creator wird hinsichtlich Themengebiet, Region und Content-Qualität geprüft. So stellen wir sicher, dass Unternehmen und Creator fachlich und menschlich zusammenpassen.",
+        "q": "Dürfen wir die Videos für Werbung nutzen?",
+        "a": "Wenn die entsprechenden Nutzungsrechte vereinbart wurden. Nennen Sie den geplanten Einsatz bereits in Ihrer Anfrage. Kanäle, Zeitraum und weitere Bedingungen halten wir vor Projektbeginn fest."
       },
       {
-        q: "Wer besitzt die Nutzungsrechte?",
-        a: "Die Nutzungsrechte werden vor Projektbeginn transparent vereinbart. So wissen beide Seiten von Anfang an, welche Inhalte wie verwendet werden dürfen.",
+        "q": "Wie lange dauert ein Projekt?",
+        "a": "Das hängt unter anderem vom Drehort, den Mitwirkenden und den Freigaben ab. Den Zeitplan vereinbaren wir mit dem Projektumfang. Das Pilotangebot sieht eine gebündelte Korrekturrunde zum abgestimmten Briefing vor."
       },
       {
-        q: "Wie lange dauert ein Projekt?",
-        a: "Die Projektdauer hängt vom Umfang und den individuellen Anforderungen ab. Nach dem Erstgespräch erhalten Sie eine realistische Einschätzung des weiteren Ablaufs.",
-      },
-      {
-        q: "Gibt es Mindestlaufzeiten?",
-        a: "Nein. Jede Zusammenarbeit wird individuell geplant und auf die jeweiligen Projektziele abgestimmt.",
-      },
-      {
-        q: "Was passiert, wenn aktuell kein passender Creator verfügbar ist?",
-        a: "Qualität steht für uns an erster Stelle. Sollte aktuell kein passender Creator verfügbar sein, kommunizieren wir das offen und suchen gemeinsam nach einer geeigneten Lösung.",
-      },
-      {
-        q: "Wie startet eine Zusammenarbeit?",
-        a: "Die Zusammenarbeit beginnt mit einem unverbindlichen Erstgespräch. Dabei lernen wir Ihr Unternehmen und Ihre Ziele kennen und besprechen die nächsten Schritte.",
-      },
-    ],
-  },
-  closing: {
-    title:
-      "Lassen Sie uns unverbindlich besprechen, welche Creator zu Ihrem Unternehmen passen.",
-  },
+        "q": "Was wird im Pilot ausgewertet?",
+        "a": "Wir betrachten, wie Sie die Inhalte einsetzen und welche Fragen sie beantworten. Reichweite, Anfragen oder Verkäufe lassen sich nur mit passender Ausspielung und verfügbaren Messdaten bewerten. Solche Ergebnisse sind keine garantierte Leistung des Produktionspakets."
+      }
+    ]
+  }
 } as const;
 
 /* ---------- Funnel: Creator ---------- */
@@ -209,9 +217,9 @@ export const companyFunnel = {
 export const creatorFunnel = {
   hero: {
     eyebrow: "Für Creator",
-    title: "Finde passende Kooperationen mit Unternehmen der Energiewende.",
+    title: "Zeige, wie Energielösungen im echten Leben funktionieren.",
     subtitle:
-      "Wir bringen Creator und Unternehmen zusammen, die fachlich, regional und menschlich zueinander passen.",
+      "Du erklärst gern, stellst gute Fragen oder setzt Projekte verständlich in Szene? Bei Raistell geht es um Inhalte für Unternehmen und – wenn es passt – um Veröffentlichungen auf deinem Kanal.",
   },
   problem: {
     eyebrow: "Das Problem",
@@ -224,8 +232,8 @@ export const creatorFunnel = {
   },
   solution: {
     eyebrow: "Unsere Lösung",
-    title: "Wir bringen die richtigen Partner zusammen.",
-    text: "Mit klaren Abläufen – damit du dich auf deinen Content konzentrieren kannst.",
+    title: "Gute Inhalte zählen. Passende Reichweite kann dazukommen.",
+    text: "Für die reine Videoproduktion zählt die Qualität deiner Arbeit. Für Veröffentlichungen auf deinem Profil prüfen wir zusätzlich dein Publikum. Beide Leistungen stimmen wir vor jedem Projekt getrennt mit dir ab.",
   },
   whyRaistell: {
     eyebrow: "Warum Raistell?",
@@ -246,7 +254,7 @@ export const creatorFunnel = {
       {
         n: "01",
         title: "Bewerbung",
-        text: "Bewirb dich mit deinem Profil und deinen Kanälen.",
+        text: "Bewirb dich mit deinem Profil oder Portfolio und passenden Arbeitsproben.",
       },
       {
         n: "02",
@@ -271,7 +279,7 @@ export const creatorFunnel = {
       {
         n: "06",
         title: "Auszahlung",
-        text: "Nach erfolgreichem Projekt erhältst du deine Vergütung.",
+        text: "Honorar, Leistung und Zahlungsbedingungen werden vor jedem Projekt vereinbart.",
       },
     ],
   },
@@ -303,7 +311,7 @@ export const creatorFunnel = {
       },
       {
         q: "Wann bekomme ich Anfragen?",
-        a: "Sobald ein Unternehmen zu deinem Profil passt, melden wir uns bei dir.",
+        a: "Wir melden uns, wenn ein Projekt zu deinem Profil passt. Eine Bewerbung ist keine Zusage für Aufträge.",
       },
       {
         q: "Wie werde ich bezahlt?",
@@ -321,12 +329,11 @@ export const creatorFunnel = {
 
 export const about = {
   eyebrow: "Über uns",
-  title: "Wir bringen zusammen, was wirklich zueinander passt.",
+  title: "Energie verständlich machen. Zusammenarbeit persönlich halten.",
   paragraphs: [
-    "Die Idee zu Raistell entstand aus praktischer Erfahrung im Vertrieb der Energiewende. Dabei wurde immer wieder deutlich: Unternehmen haben viel zu erklären, Creator besitzen das Vertrauen ihrer Community – doch beide finden oft nicht auf eine Weise zusammen, die wirklich passt.",
-    "Unsere Arbeit beginnt deshalb mit Zuhören. Wir möchten verstehen, welches Ziel ein Unternehmen verfolgt, wofür ein Creator steht und ob Thema, Region, Community und Zusammenarbeit wirklich zusammenpassen. Erst dann empfehlen wir eine Verbindung.",
-    "Von der sorgfältigen Auswahl über Briefing, Verträge und Abstimmungen bis zur Veröffentlichung begleiten wir jedes Projekt persönlich und verlässlich. Unternehmen erhalten Orientierung und einen festen Ansprechpartner. Creator erhalten passende Anfragen, transparente Bedingungen und den Freiraum, glaubwürdig zu bleiben.",
-    "Unser Anspruch ist nicht, möglichst viele Verbindungen herzustellen. Sondern die richtigen – damit gute Lösungen verständlich werden, Partnerschaften fair bleiben und Vertrauen wachsen kann.",
+    "Die Idee zu Raistell entstand aus praktischer Erfahrung im Vertrieb der Energiewende. Gute Lösungen brauchen verständliche Erklärungen – und Menschen, die die richtigen Fragen stellen.",
+    "Deshalb beginnt jedes Projekt mit Zuhören: Was möchten Ihre Kunden wissen? Was lässt sich an einem echten Projekt zeigen? Wir bringen Ihr Unternehmen und passende Creator zusammen und koordinieren die Umsetzung.",
+    "Sie haben einen festen Ansprechpartner und wissen vor dem Start, welche Inhalte entstehen und wie Sie diese einsetzen können. Creator erhalten ein klares Briefing und Raum für ihre eigene, glaubwürdige Perspektive.",
   ],
   name: {
     title: "Wie der Name Raistell entstand",

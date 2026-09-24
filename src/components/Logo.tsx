@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { site } from "@/config/site";
 
 export function Logo({
@@ -8,12 +10,12 @@ export function Logo({
   className?: string;
 }) {
   return (
-    <a
+    <Link
       href="/#start"
       aria-label={`${site.name} – zur Startseite`}
       className={`inline-flex items-center gap-2.5 ${className}`}
     >
-      <img
+      <Image
         src="/logo-mark.png"
         alt=""
         width={40}
@@ -27,6 +29,6 @@ export function Logo({
       >
         {site.name}
       </span>
-    </a>
+    </Link>
   );
 }

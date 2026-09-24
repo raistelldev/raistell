@@ -23,18 +23,14 @@ export function Header() {
 
   useEffect(() => {
     if (isAdmin) return;
-    const mq = window.matchMedia("(min-width: 768px)");
+    const mq = window.matchMedia("(min-width: 1024px)");
     const onChange = () => mq.matches && setOpen(false);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, [isAdmin]);
 
   useEffect(() => {
-    if (isAdmin || !isHome) {
-      setActiveHref("");
-      return;
-    }
-    setActiveHref("#start");
+    if (isAdmin || !isHome) return;
     const ids = navItems.map((item) => item.href.replace("#", ""));
     const elements = ids
       .map((id) => document.getElementById(id))
@@ -109,7 +105,7 @@ export function Header() {
   return (
     <header className="header-facet sticky top-0 z-50 border-b border-line">
       <div className="relative mx-auto max-w-6xl px-4">
-        <div className="flex h-16 items-center justify-between md:hidden">
+        <div className="flex h-16 items-center justify-between lg:hidden">
           <Logo />
 
           <button
@@ -128,7 +124,7 @@ export function Header() {
           </button>
         </div>
 
-        <div className="hidden h-16 items-center justify-between md:flex">
+        <div className="hidden h-16 items-center justify-between lg:flex">
           <Logo />
           <nav aria-label="Hauptnavigation">
             <ul className="flex items-center gap-0.5">
@@ -164,7 +160,7 @@ export function Header() {
         <nav
           id="mobile-nav"
           aria-label="Hauptnavigation mobil"
-          className="header-facet relative border-t border-line md:hidden"
+          className="header-facet relative border-t border-line lg:hidden"
         >
           <ul className="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-2">
             {navItems.map((item) => (

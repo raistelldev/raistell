@@ -25,6 +25,9 @@ const FIELD_LABELS: Record<string, string> = {
   about: "Content",
   price: "Preisvorstellung",
   role: "Rolle",
+  profileUrl: "Profil oder Portfolio",
+  collaborationType: "Art der Zusammenarbeit",
+  consent: "Datenschutzhinweis bestätigt",
 };
 
 const DETAIL_ORDER = [
@@ -38,6 +41,8 @@ const DETAIL_ORDER = [
   "budget",
   "message",
   "platforms",
+  "profileUrl",
+  "collaborationType",
   "reach",
   "topic",
   "about",

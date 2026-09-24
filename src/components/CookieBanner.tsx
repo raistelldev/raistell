@@ -1,38 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 
 /* Speichert die Cookie-Auswahl lokal, damit der Hinweis nicht erneut erscheint. */
 const STORAGE_KEY = "cookie-consent";
 
+function subscribeStorage(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  return () => window.removeEventListener("storage", onChange);
+}
+
+function hasNoChoice() {
+  try { return !localStorage.getItem(STORAGE_KEY); }
+  catch { return true; }
+}
+
 export function CookieBanner() {
   const pathname = usePathname();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (pathname?.startsWith("/admin")) {
-      setVisible(false);
-      return;
-    }
-    if (!localStorage.getItem(STORAGE_KEY)) setVisible(true);
-  }, [pathname]);
+  const [dismissed, setDismissed] = useState(false);
+  const visible = useSyncExternalStore(subscribeStorage, hasNoChoice, () => false);
 
   function decide(value: "accepted" | "declined") {
-    localStorage.setItem(STORAGE_KEY, value);
-    setVisible(false);
+    try { localStorage.setItem(STORAGE_KEY, value); } catch { /* Choice still applies for this visit. */ }
+    setDismissed(true);
   }
 
-  if (pathname?.startsWith("/admin") || !visible) return null;
+  if (pathname?.startsWith("/admin") || !visible || dismissed) return null;
 
   return (
     <div
-      role="dialog"
+      role="region"
       aria-live="polite"
       aria-label="Cookie-Hinweis"
-      className="fixed inset-x-0 bottom-0 z-[60] px-4 pb-4"
+      className="border-t border-line bg-page px-5 py-4"
     >
-      <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-theme border border-line bg-surface p-5 shadow-lg sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-soft">
           Wir verwenden nur technisch notwendige Cookies. Details finden Sie in
           der{" "}
