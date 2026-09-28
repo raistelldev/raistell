@@ -15,9 +15,9 @@ export const site = {
     phone: "",
   },
   legal: {
-    providerName: "[Vor- und Nachname / Firma]",
-    street: "[Straße und Hausnummer]",
-    city: "[PLZ und Ort]",
+    providerName: "Hamza Dawoud",
+    street: "Bajre Kaljanca 29",
+    city: "71218 Ilidza",
     country: "Bosnien und Herzegowina",
   },
 } as const;
@@ -26,11 +26,11 @@ export type Audience = "firma" | "creator";
 
 export type NavItem = { label: string; href: string };
 
-/** Die zwei zentralen CTAs. */
+/** Zentrale Button-Ziele. Calendly wird vom Betreiber erst vor Livegang ergänzt. */
 export const ctas = {
   company: {
-    label: "Pilotprojekt besprechen",
-    shortLabel: "Projekt besprechen",
+    label: "Projekt anfragen",
+    shortLabel: "Projekt anfragen",
     href: "/?role=firma#kontakt",
     role: "firma" as const,
   },
@@ -374,11 +374,11 @@ export const services: Service[] = [
   {
     slug: "sponsoring",
     title: "Sponsoring",
-    description: "Klarer Einstieg",
+    description: "Erwähnung auf Creator-Kanälen",
     icon: "handshake",
-    long: "Eine kurze, glaubwürdige Erwähnung Ihres Unternehmens oder Produkts. Einfach, schnell umsetzbar – der ideale Einstieg.",
+    long: "Eine kurze, glaubwürdige Erwähnung Ihres Unternehmens oder Produkts auf einem passenden Creator-Kanal. Creator, Veröffentlichung und Nutzungsrechte werden separat zum Produktionspilot vereinbart.",
     points: [
-      "Schneller, klarer Einstieg",
+      "Klar vereinbarte Erwähnung und Veröffentlichung",
       "Passender Creator-Fit",
       "Saubere Abstimmung von Leistung und Gegenleistung",
     ],
