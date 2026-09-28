@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ServiceIcon } from "@/components/ServiceIcon";
-import { getService, services, site } from "@/config/site";
+import { ctas, getService, services, site } from "@/config/site";
 
 type Params = { slug: string };
 
@@ -33,6 +33,9 @@ export async function generateMetadata({
       description,
       url: `/dienstleistungen/${slug}`,
       type: "website",
+      locale: "de_DE",
+      siteName: site.name,
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: site.name }],
     },
   };
 }
@@ -94,10 +97,10 @@ export default async function ServiceDetailPage({
           passenden Vorschlag.
         </p>
         <Link
-          href="/?role=firma#kontakt"
+          href={ctas.company.href}
           className="mt-6 inline-flex rounded-theme bg-on-brand px-6 py-3 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft"
         >
-          Projekt besprechen
+          {ctas.company.label}
         </Link>
       </div>
 
