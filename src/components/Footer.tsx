@@ -15,7 +15,7 @@ export function Footer() {
 
   function sectionHref(hash: string) {
     if (!hash.startsWith("#")) return hash;
-    return isHome ? hash : `/${hash}`;
+    return isHome ? hash : `/?role=${audience}${hash}`;
   }
 
   return (
@@ -49,6 +49,14 @@ export function Footer() {
           <div>
             <p className="text-sm font-semibold text-on-dark">Rechtliches</p>
             <ul className="mt-3 space-y-2">
+              <li>
+                <a
+                  href="/impressum"
+                  className="text-sm text-on-dark/75 hover:text-on-dark"
+                >
+                  Impressum
+                </a>
+              </li>
               <li>
                 <a
                   href="/datenschutz"

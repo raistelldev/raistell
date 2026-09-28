@@ -4,16 +4,16 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 import { useAudience } from "@/components/AudienceContext";
-import { ctas, navByAudience } from "@/config/site";
+import { ctas, navByAudience, type Audience } from "@/config/site";
 
-function sectionHref(hash: string, isHome: boolean) {
+function sectionHref(hash: string, isHome: boolean, audience: Audience) {
   if (!hash.startsWith("#")) return hash;
-  return isHome ? hash : `/${hash}`;
+  return isHome ? hash : `/?role=${audience}${hash}`;
 }
 
 export function Header() {
   const pathname = usePathname();
-  const { audience, setAudience } = useAudience();
+  const { audience } = useAudience();
   const navItems = navByAudience[audience];
   const [open, setOpen] = useState(false);
   const [activeHref, setActiveHref] = useState("#start");
@@ -84,19 +84,6 @@ export function Header() {
     window.history.replaceState(null, "", href);
   }
 
-  function goToForm(e: React.MouseEvent) {
-    e.preventDefault();
-    setAudience(audience);
-    setOpen(false);
-    if (isHome) {
-      document.getElementById("kontakt")?.scrollIntoView({
-        behavior: "smooth",
-      });
-      return;
-    }
-    window.location.assign(primaryCta.href);
-  }
-
   const ctaLabel =
     audience === "firma" ? ctas.company.shortLabel : ctas.creator.label;
 
@@ -131,7 +118,7 @@ export function Header() {
               {navItems.map((item) => (
                 <li key={item.href}>
                   <a
-                    href={sectionHref(item.href, isHome)}
+                    href={sectionHref(item.href, isHome, audience)}
                     aria-current={
                       isHome && activeHref === item.href ? "true" : undefined
                     }
@@ -145,7 +132,7 @@ export function Header() {
               <li>
                 <a
                   href={primaryCta.href}
-                  onClick={goToForm}
+                  onClick={() => setOpen(false)}
                   className="ml-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-strong"
                 >
                   {ctaLabel}
@@ -166,7 +153,7 @@ export function Header() {
             {navItems.map((item) => (
               <li key={item.href}>
                 <a
-                  href={sectionHref(item.href, isHome)}
+                  href={sectionHref(item.href, isHome, audience)}
                   aria-current={
                     isHome && activeHref === item.href ? "true" : undefined
                   }
@@ -180,7 +167,7 @@ export function Header() {
             <li className="pt-1">
               <a
                 href={primaryCta.href}
-                onClick={goToForm}
+                onClick={() => setOpen(false)}
                 className="block rounded-full bg-brand px-4 py-3 text-center text-base font-semibold text-on-brand hover:bg-brand-strong"
               >
                 {primaryCta.label}
