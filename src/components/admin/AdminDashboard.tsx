@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ImpressumData, Lead, LeadRole } from "@/lib/db";
+import type { Lead, LeadRole } from "@/lib/db";
+import { site } from "@/config/site";
 
 type Filter = "all" | LeadRole;
 type Tab = "leads" | "impressum";
@@ -74,6 +75,7 @@ function formatShortDate(value: string) {
 
 function formatValue(value: unknown): string {
   if (value == null || value === "") return "—";
+  if (typeof value === "boolean") return value ? "Ja" : "Nein";
   if (Array.isArray(value)) return value.length ? value.join(", ") : "—";
   return String(value);
 }
@@ -122,64 +124,61 @@ export function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [automaticDeletionEnabled, setAutomaticDeletionEnabled] = useState(false);
+  const [savingCollaboration, setSavingCollaboration] = useState(false);
+  const [collaborationError, setCollaborationError] = useState<string | null>(null);
 
-  const [impressum, setImpressum] = useState<ImpressumData | null>(null);
-  const [impressumSaving, setImpressumSaving] = useState(false);
-  const [impressumMessage, setImpressumMessage] = useState<string | null>(null);
+  function chooseTab(nextTab: Tab) {
+    if (nextTab === tab) return;
+    setError(null);
+    setLoading(true);
+    setTab(nextTab);
+  }
 
-  const loadLeads = useCallback(
-    async (role: Filter) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const qs = role === "all" ? "" : `?role=${role}`;
-        const res = await fetch(`/api/admin/leads${qs}`);
-        if (res.status === 401) {
+  function chooseFilter(nextFilter: Filter) {
+    if (nextFilter === filter) return;
+    setError(null);
+    setLoading(true);
+    setFilter(nextFilter);
+  }
+
+  useEffect(() => {
+    if (tab !== "leads") return;
+    const controller = new AbortController();
+    const endpoint = `/api/admin/leads${filter === "all" ? "" : `?role=${filter}`}`;
+
+    void fetch(endpoint, { signal: controller.signal })
+      .then(async (response) => {
+        if (controller.signal.aborted) return;
+        if (response.status === 401) {
           router.replace("/admin/login");
           return;
         }
-        const data = (await res.json()) as { leads?: Lead[]; error?: string };
-        if (!res.ok) {
+        const data = (await response.json()) as {
+          leads?: Lead[];
+          error?: string;
+          retention?: { automaticDeletionEnabled?: boolean };
+        };
+        if (controller.signal.aborted) return;
+        if (!response.ok) {
           setError(data.error ?? "Laden fehlgeschlagen.");
           return;
         }
-        setLeads(data.leads ?? []);
-        setSelected(new Set());
-      } catch {
-        setError("Netzwerkfehler beim Laden der Leads.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [router],
-  );
+        if (tab === "leads") {
+          setLeads(data.leads ?? []);
+          setAutomaticDeletionEnabled(data.retention?.automaticDeletionEnabled === true);
+          setSelected(new Set());
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setError("Netzwerkfehler beim Laden.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
 
-  const loadImpressum = useCallback(async () => {
-    setError(null);
-    try {
-      const res = await fetch("/api/admin/impressum");
-      if (res.status === 401) {
-        router.replace("/admin/login");
-        return;
-      }
-      const data = (await res.json()) as {
-        impressum?: ImpressumData;
-        error?: string;
-      };
-      if (!res.ok) {
-        setError(data.error ?? "Impressum laden fehlgeschlagen.");
-        return;
-      }
-      setImpressum(data.impressum ?? null);
-    } catch {
-      setError("Netzwerkfehler beim Laden des Impressums.");
-    }
-  }, [router]);
-
-  useEffect(() => {
-    if (tab === "leads") void loadLeads(filter);
-    else void loadImpressum();
-  }, [tab, filter, loadLeads, loadImpressum]);
+    return () => controller.abort();
+  }, [tab, filter, router]);
 
   useEffect(() => {
     if (!detailLead) return;
@@ -301,36 +300,32 @@ export function AdminDashboard() {
     router.refresh();
   }
 
-  async function saveImpressum(e: React.FormEvent) {
-    e.preventDefault();
-    if (!impressum) return;
-    setImpressumSaving(true);
-    setImpressumMessage(null);
-    setError(null);
+  async function updateCollaboration(lead: Lead, hasCollaboration: boolean) {
+    if (savingCollaboration) return;
+    setSavingCollaboration(true);
+    setCollaborationError(null);
     try {
-      const res = await fetch("/api/admin/impressum", {
-        method: "PUT",
+      const response = await fetch("/api/admin/leads", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(impressum),
+        body: JSON.stringify({ id: lead.id, hasCollaboration }),
       });
-      if (res.status === 401) {
+      if (response.status === 401) {
         router.replace("/admin/login");
         return;
       }
-      const data = (await res.json()) as {
-        impressum?: ImpressumData;
-        error?: string;
-      };
-      if (!res.ok) {
-        setError(data.error ?? "Speichern fehlgeschlagen.");
+      const result = (await response.json()) as { lead?: Lead; error?: string };
+      if (!response.ok || !result.lead) {
+        setCollaborationError(result.error ?? "Status konnte nicht gespeichert werden.");
         return;
       }
-      if (data.impressum) setImpressum(data.impressum);
-      setImpressumMessage("Impressum gespeichert.");
+      const updated = result.lead;
+      setLeads((current) => current.map((item) => item.id === updated.id ? updated : item));
+      setDetailLead((current) => current?.id === updated.id ? updated : current);
     } catch {
-      setError("Netzwerkfehler beim Speichern.");
+      setCollaborationError("Netzwerkfehler beim Speichern des Status.");
     } finally {
-      setImpressumSaving(false);
+      setSavingCollaboration(false);
     }
   }
 
@@ -361,12 +356,12 @@ export function AdminDashboard() {
       </header>
 
       <div className="mt-6 inline-flex w-full rounded-theme border border-line bg-surface p-1 sm:w-auto">
-        <TabButton active={tab === "leads"} onClick={() => setTab("leads")}>
+        <TabButton active={tab === "leads"} onClick={() => chooseTab("leads")}>
           Einträge
         </TabButton>
         <TabButton
           active={tab === "impressum"}
-          onClick={() => setTab("impressum")}
+          onClick={() => chooseTab("impressum")}
         >
           Impressum
         </TabButton>
@@ -383,6 +378,19 @@ export function AdminDashboard() {
 
       {tab === "leads" ? (
         <section className="mt-6 space-y-4">
+          <p className="rounded-theme border border-line bg-surface px-4 py-3 text-sm leading-relaxed text-ink-soft">
+            Anfragen und Creator-Profile ohne Zusammenarbeit haben eine Löschfrist
+            von sechs Monaten ab Eingang. Eine begonnene Zusammenarbeit können
+            Sie unter „Details“ kennzeichnen. Ein Kennenlerngespräch allein zählt
+            noch nicht als Zusammenarbeit.{" "}
+            <strong className="text-ink">
+              {automaticDeletionEnabled
+                ? "Der automatische Löschlauf ist für dieses Deployment freigegeben."
+                : "Der automatische Löschlauf ist noch nicht freigegeben."}
+            </strong>{" "}
+            Exportierte Dateien, E-Mails und Calendly-Daten müssen separat
+            entsprechend der Frist geprüft und gelöscht werden.
+          </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div className="flex rounded-theme border border-line bg-surface p-0.5">
               {(
@@ -395,7 +403,7 @@ export function AdminDashboard() {
                 <button
                   key={value}
                   type="button"
-                  onClick={() => setFilter(value)}
+                  onClick={() => chooseFilter(value)}
                   className={`flex-1 rounded-theme px-3 py-2 text-sm font-semibold transition-colors sm:flex-none ${
                     filter === value
                       ? "bg-brand text-on-brand"
@@ -487,6 +495,7 @@ export function AdminDashboard() {
                         <p className="mt-2 truncate font-semibold text-ink">
                           {lead.name}
                         </p>
+                        <p className="mt-1 text-xs text-ink-soft">{retentionLabel(lead)}</p>
                         <a
                           href={`mailto:${lead.email}`}
                           className="mt-0.5 block truncate text-sm text-brand"
@@ -504,7 +513,7 @@ export function AdminDashboard() {
                         <div className="mt-3 grid grid-cols-2 gap-2">
                           <button
                             type="button"
-                            onClick={() => setDetailLead(lead)}
+                            onClick={() => { setCollaborationError(null); setDetailLead(lead); }}
                             className="rounded-theme bg-brand px-3 py-2.5 text-sm font-semibold text-on-brand"
                           >
                             Details
@@ -579,6 +588,7 @@ export function AdminDashboard() {
                             {lead.name}
                           </p>
                           <p className="truncate text-ink-soft">{lead.email}</p>
+                          <p className="mt-1 text-xs text-ink-soft">{retentionLabel(lead)}</p>
                         </td>
                         <td className="px-3 py-3 align-middle">
                           <p className="line-clamp-2 text-ink-soft">
@@ -592,7 +602,7 @@ export function AdminDashboard() {
                           <div className="flex flex-wrap gap-1.5">
                             <button
                               type="button"
-                              onClick={() => setDetailLead(lead)}
+                              onClick={() => { setCollaborationError(null); setDetailLead(lead); }}
                               className="rounded-theme border border-line px-2.5 py-1.5 text-xs font-semibold text-brand transition-colors hover:border-brand hover:bg-brand-soft"
                             >
                               Details
@@ -616,47 +626,18 @@ export function AdminDashboard() {
           )}
         </section>
       ) : (
-        <section className="mt-6 max-w-2xl">
-          {!impressum ? (
-            <p className="text-sm text-ink-soft">Lädt …</p>
-          ) : (
-            <form
-              onSubmit={(e) => void saveImpressum(e)}
-              className="space-y-4 rounded-theme border border-line bg-surface p-5 sm:p-6"
-            >
-              <div>
-                <label
-                  htmlFor="impressum-text"
-                  className="mb-1.5 block text-sm font-medium text-ink"
-                >
-                  Impressum-Text
-                </label>
-                <textarea
-                  id="impressum-text"
-                  value={impressum.text}
-                  onChange={(e) =>
-                    setImpressum({ ...impressum, text: e.target.value })
-                  }
-                  rows={16}
-                  className="w-full resize-y rounded-theme border border-line bg-page px-3 py-2.5 font-mono text-sm leading-relaxed text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft"
-                />
-              </div>
-
-              {impressumMessage && (
-                <p className="rounded-theme bg-brand-soft px-3 py-2 text-sm text-brand">
-                  {impressumMessage}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={impressumSaving}
-                className="w-full rounded-theme bg-brand px-5 py-3 text-sm font-semibold text-on-brand hover:bg-brand-strong disabled:opacity-70 sm:w-auto"
-              >
-                {impressumSaving ? "Speichert …" : "Impressum speichern"}
-              </button>
-            </form>
-          )}
+        <section className="mt-6 max-w-2xl rounded-theme border border-line bg-surface p-5 sm:p-6">
+          <h2 className="text-lg font-semibold">Aktuell hinterlegte Betreiberangaben</h2>
+          <p className="mt-4 text-sm leading-relaxed">
+            {site.legal.providerName}<br />{site.legal.street}<br />
+            {site.legal.city}<br />{site.legal.country}<br />{site.contact.email}
+          </p>
+          <p className="mt-5 text-sm leading-relaxed text-ink-soft">
+            Diese Angaben und die Rechtstexte werden im Website-Projekt gepflegt.
+            Änderungen erfordern eine neue Veröffentlichung. Die Rechtstexte sind
+            noch Entwürfe zur Prüfung.
+          </p>
+          <a href="/impressum" target="_blank" rel="noopener noreferrer" className="mt-5 inline-block text-sm font-semibold text-brand underline underline-offset-4">Aktuelles Impressum ansehen</a>
         </section>
       )}
 
@@ -702,7 +683,30 @@ export function AdminDashboard() {
               </button>
             </div>
 
-            <dl className="flex-1 space-y-0 overflow-y-auto px-5 py-2">
+            <div className="flex-1 overflow-y-auto px-5 py-2">
+              <section aria-label="Zusammenarbeit und Löschfrist" className="my-3 rounded-theme border border-line bg-page p-4 text-sm">
+                <h3 className="font-semibold text-ink">Zusammenarbeit und Löschfrist</h3>
+                <p className="mt-2 text-ink-soft">{retentionLabel(detailLead)}</p>
+                <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                  {detailLead.collaboration_started_at
+                    ? "Dieser Eintrag ist vom Löschlauf für erfolglose Anfragen ausgenommen. Projekt- und Vertragsdaten brauchen eine gesonderte Aufbewahrungsprüfung. Eine Korrektur startet die ursprüngliche Sechsmonatsfrist nicht neu."
+                    : "Nur eine tatsächlich begonnene Zusammenarbeit markieren. Ein Gespräch, eine Bewerbung oder eine Aufnahme ins Netzwerk allein hebt die Frist nicht auf."}
+                </p>
+                {collaborationError && <p role="alert" className="mt-3 text-red-700">{collaborationError}</p>}
+                <button
+                  type="button"
+                  disabled={savingCollaboration || deleting}
+                  onClick={() => void updateCollaboration(detailLead, !detailLead.collaboration_started_at)}
+                  className="mt-3 rounded-theme border border-line bg-surface px-3 py-2 text-sm font-semibold text-brand disabled:opacity-50"
+                >
+                  {savingCollaboration
+                    ? "Speichert …"
+                    : detailLead.collaboration_started_at
+                      ? "Korrigieren: Zusammenarbeit noch nicht begonnen"
+                      : "Zusammenarbeit als begonnen markieren"}
+                </button>
+              </section>
+            <dl className="space-y-0">
               {leadEntries(detailLead)
                 .filter(([key]) => !["name", "email", "role", "created_at"].includes(key))
                 .map(([key, value]) => (
@@ -710,7 +714,7 @@ export function AdminDashboard() {
                     key={key}
                     className="grid grid-cols-1 gap-0.5 border-b border-line/70 py-3 last:border-0 sm:grid-cols-[8.5rem_1fr] sm:gap-4"
                   >
-                    <dt className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
+                    <dt className="break-words text-xs font-semibold uppercase tracking-wider text-ink-soft">
                       {labelFor(key)}
                     </dt>
                     <dd className="whitespace-pre-wrap break-words text-sm text-ink">
@@ -719,6 +723,7 @@ export function AdminDashboard() {
                   </div>
                 ))}
             </dl>
+            </div>
 
             <div className="border-t border-line px-5 py-4">
               <button
@@ -735,6 +740,12 @@ export function AdminDashboard() {
       )}
     </main>
   );
+}
+
+function retentionLabel(lead: Lead) {
+  if (lead.collaboration_started_at) return "Zusammenarbeit begonnen";
+  if (!lead.retention_expires_at) return "Löschfrist wird geprüft";
+  return `Löschfrist: ${formatDate(lead.retention_expires_at)}`;
 }
 
 function RoleBadge({ role }: { role: LeadRole }) {
