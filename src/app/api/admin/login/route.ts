@@ -8,13 +8,17 @@ import {
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  let body: { password?: string };
+  let input: unknown;
 
   try {
-    body = (await request.json()) as { password?: string };
+    input = await request.json();
   } catch {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
   }
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+  }
+  const body = input as Record<string, unknown>;
 
   const password = typeof body.password === "string" ? body.password : "";
   if (!checkAdminPassword(password)) {

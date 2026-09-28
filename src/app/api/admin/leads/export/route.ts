@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { csvCell } from "@/lib/csv";
 import {
   listLeads,
   listLeadsByIds,
@@ -8,15 +9,6 @@ import {
 } from "@/lib/db";
 
 export const runtime = "nodejs";
-
-type ExportMode = "all" | "firma" | "creator" | "selected";
-
-function csvEscape(value: string) {
-  if (/[",\n\r]/.test(value)) {
-    return `"${value.replaceAll('"', '""')}"`;
-  }
-  return value;
-}
 
 function payloadSummary(payload: Record<string, unknown>) {
   const parts: string[] = [];
@@ -33,18 +25,20 @@ function payloadSummary(payload: Record<string, unknown>) {
 }
 
 function leadsToCsv(leads: Lead[]) {
-  const header = ["id", "role", "name", "email", "created_at", "details"];
+  const header = ["id", "role", "name", "email", "created_at", "collaboration_started_at", "retention_expires_at", "details"];
   const rows = leads.map((lead) => [
     lead.id,
     lead.role,
     lead.name,
     lead.email,
     new Date(lead.created_at).toISOString(),
+    lead.collaboration_started_at ? new Date(lead.collaboration_started_at).toISOString() : "",
+    lead.retention_expires_at ? new Date(lead.retention_expires_at).toISOString() : "",
     payloadSummary(lead.payload ?? {}),
   ]);
 
   return [header, ...rows]
-    .map((cols) => cols.map((c) => csvEscape(String(c))).join(","))
+    .map((cols) => cols.map((c) => csvCell(String(c))).join(","))
     .join("\n");
 }
 
@@ -53,12 +47,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { mode?: ExportMode; ids?: string[] };
+  let input: unknown;
   try {
-    body = (await request.json()) as { mode?: ExportMode; ids?: string[] };
+    input = await request.json();
   } catch {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
   }
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+  }
+  const body = input as Record<string, unknown>;
 
   const mode = body.mode;
   if (
@@ -74,7 +72,7 @@ export async function POST(request: Request) {
     let leads: Lead[];
     if (mode === "selected") {
       const ids = Array.isArray(body.ids)
-        ? body.ids.filter((id) => typeof id === "string")
+        ? body.ids.filter((id): id is string => typeof id === "string")
         : [];
       if (ids.length === 0) {
         return NextResponse.json(

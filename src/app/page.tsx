@@ -22,14 +22,14 @@ export default function Home() {
     <main>
       <Hero />
       {audience === "firma" ? <CompanyFunnel /> : <CreatorFunnel />}
-      <Contact />
+      <About />
       <Faq
         eyebrow={faq.eyebrow}
         title={faq.title}
         items={faq.items}
         tone="light"
       />
-      <About />
+      <Contact />
     </main>
   );
 }

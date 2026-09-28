@@ -23,7 +23,7 @@ export function Section({
           : "bg-page";
   return (
     <section id={id} className={`scroll-mt-16 ${bg} ${className}`}>
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:py-28 md:py-32">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 md:py-24">
         {children}
       </div>
     </section>

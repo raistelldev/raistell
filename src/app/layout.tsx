@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CookieBanner } from "@/components/CookieBanner";
 import { AudienceProvider } from "@/components/AudienceContext";
 import { companyFunnel, site } from "@/config/site";
 import { getSiteUrl } from "@/lib/site-url";
@@ -15,7 +14,7 @@ const inter = Inter({
 });
 
 const siteUrl = getSiteUrl();
-const title = `${site.name} – Authentische Creator für die Energiewende`;
+const title = `${site.name} – Creator-Videos für die Energiewende`;
 const description = companyFunnel.hero.subtitle;
 
 export const metadata: Metadata = {
@@ -90,7 +89,6 @@ export default function RootLayout({
           <Header />
           <div className="flex-1">{children}</div>
           <Footer />
-          <CookieBanner />
         </AudienceProvider>
       </body>
     </html>

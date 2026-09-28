@@ -1,7 +1,8 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ServiceIcon } from "@/components/ServiceIcon";
-import { getService, services, site } from "@/config/site";
+import { ctas, getService, services, site } from "@/config/site";
 
 type Params = { slug: string };
 
@@ -32,6 +33,9 @@ export async function generateMetadata({
       description,
       url: `/dienstleistungen/${slug}`,
       type: "website",
+      locale: "de_DE",
+      siteName: site.name,
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: site.name }],
     },
   };
 }
@@ -47,7 +51,7 @@ export default async function ServiceDetailPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 md:py-24">
-      <a
+      <Link
         href="/#ablauf"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-strong"
       >
@@ -55,7 +59,7 @@ export default async function ServiceDetailPage({
           <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         Zum Ablauf
-      </a>
+      </Link>
 
       <div className="mt-10">
         <div className="flex items-center gap-3">
@@ -92,12 +96,12 @@ export default async function ServiceDetailPage({
           Lassen Sie uns unverbindlich sprechen – wir melden uns mit einem
           passenden Vorschlag.
         </p>
-        <a
-          href="/?role=firma#kontakt"
+        <Link
+          href={ctas.company.href}
           className="mt-6 inline-flex rounded-theme bg-on-brand px-6 py-3 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft"
         >
-          Kostenloses Erstgespräch vereinbaren
-        </a>
+          {ctas.company.label}
+        </Link>
       </div>
 
     </main>

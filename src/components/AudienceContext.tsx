@@ -4,9 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
 } from "react";
 import type { Audience } from "@/config/site";
 
@@ -30,30 +29,18 @@ function writeAudienceToUrl(next: Audience) {
   window.dispatchEvent(new CustomEvent("raistell:audience", { detail: next }));
 }
 
+function subscribeAudience(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  window.addEventListener("raistell:audience", onChange);
+  return () => {
+    window.removeEventListener("popstate", onChange);
+    window.removeEventListener("raistell:audience", onChange);
+  };
+}
+
 export function AudienceProvider({ children }: { children: React.ReactNode }) {
-  const [audience, setAudienceState] = useState<Audience>("firma");
-
-  useEffect(() => {
-    setAudienceState(audienceFromUrl());
-    const sync = () => setAudienceState(audienceFromUrl());
-    const onCustom = (e: Event) => {
-      const next = (e as CustomEvent<Audience>).detail;
-      if (next === "firma" || next === "creator") setAudienceState(next);
-    };
-    window.addEventListener("popstate", sync);
-    window.addEventListener("raistell:audience", onCustom);
-    window.addEventListener("raistell:contact-role", onCustom);
-    return () => {
-      window.removeEventListener("popstate", sync);
-      window.removeEventListener("raistell:audience", onCustom);
-      window.removeEventListener("raistell:contact-role", onCustom);
-    };
-  }, []);
-
-  const setAudience = useCallback((next: Audience) => {
-    setAudienceState(next);
-    writeAudienceToUrl(next);
-  }, []);
+  const audience = useSyncExternalStore(subscribeAudience, audienceFromUrl, () => "firma" as Audience);
+  const setAudience = useCallback((next: Audience) => writeAudienceToUrl(next), []);
 
   const value = useMemo(
     () => ({ audience, setAudience }),

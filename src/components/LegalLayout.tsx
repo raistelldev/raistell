@@ -1,3 +1,4 @@
+import Link from "next/link";
 /* Einheitliches Layout für rechtliche Unterseiten. */
 export function LegalLayout({
   title,
@@ -8,9 +9,9 @@ export function LegalLayout({
 }) {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 md:py-24">
-      <a href="/" className="text-sm font-medium text-brand hover:text-brand-strong">
+      <Link href="/" className="text-sm font-medium text-brand hover:text-brand-strong">
         ← Zurück zur Startseite
-      </a>
+      </Link>
       <h1 className="mt-4 font-brand text-3xl font-semibold tracking-tight text-ink md:text-4xl">
         {title}
       </h1>
