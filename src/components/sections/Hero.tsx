@@ -25,7 +25,7 @@ export function Hero() {
             <h1 className="mt-5 max-w-2xl font-brand text-[2.5rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.5rem]">{content.title}</h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-on-dark/80 sm:text-lg">{content.subtitle}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a href="#kontakt" className="inline-flex items-center justify-center gap-4 rounded-theme bg-on-dark px-6 py-3.5 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft">{cta.label}<span aria-hidden="true">↗</span></a>
+              <a href={cta.href} className="inline-flex items-center justify-center gap-4 rounded-theme bg-on-dark px-6 py-3.5 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft">{cta.label}<span aria-hidden="true">↗</span></a>
               <a href={isCompany ? "#pilot" : "#loesung"} className="rounded-theme px-4 py-3 text-center text-sm font-medium text-on-dark/80 underline decoration-on-dark/30 underline-offset-4 hover:text-on-dark">{isCompany ? "Pilotangebot ansehen" : "Mehr erfahren"}</a>
             </div>
             <p className="mt-5 text-xs leading-relaxed text-on-dark/60">{isCompany ? "Erstgespräch kostenlos und unverbindlich. Umsetzung nach individuellem Angebot." : "Kostenlose Bewerbung. Du entscheidest bei jedem Projekt selbst."}</p>

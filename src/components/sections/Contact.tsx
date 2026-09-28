@@ -47,9 +47,6 @@ function LeadForm({ role }: { role: Audience }) {
       const response = await fetch("/api/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
       const result = await response.json() as { ok?: boolean; error?: string };
       if (!response.ok || !result.ok) { setError(result.error || "Senden fehlgeschlagen. Bitte erneut versuchen."); return; }
-      try {
-        sessionStorage.setItem("raistell:booking-prefill", JSON.stringify({ role, name: validation.lead.name, email: validation.lead.email }));
-      } catch { /* The request is saved even if browser storage is unavailable. */ }
       router.push(`/danke?role=${role}`);
     } catch {
       setError("Die Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie uns per E-Mail.");
@@ -68,7 +65,7 @@ function LeadForm({ role }: { role: Audience }) {
       </label>
       {error && <p role="alert" className="rounded-theme border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       <button type="submit" disabled={submitting} className="w-full rounded-theme bg-brand px-6 py-3.5 text-base font-semibold text-on-brand hover:bg-brand-strong disabled:cursor-wait disabled:opacity-70">{submitting ? "Wird gesendet …" : isCompany ? "Projekt anfragen" : "Als Creator bewerben"}</button>
-      <p className="text-center text-xs leading-relaxed text-ink-soft">{isCompany ? "Ihre Anfrage ist unverbindlich. Eine optionale Terminwahl folgt im nächsten Schritt." : "Deine Bewerbung ist kostenlos. Eine optionale Terminwahl folgt im nächsten Schritt."}</p>
+      <p className="text-center text-xs leading-relaxed text-ink-soft">{isCompany ? "Ihre Anfrage ist unverbindlich." : "Deine Bewerbung ist kostenlos. Für Profile ohne Zusammenarbeit ist eine Aufbewahrung von sechs Monaten vorgesehen. Den aktuellen Stand findest du in der Datenschutzerklärung."}</p>
       <p className="text-center text-xs text-ink-soft">Fragen? <a className="text-brand underline underline-offset-2" href={`mailto:${site.contact.email}`}>{site.contact.email}</a></p>
     </form>
   );
