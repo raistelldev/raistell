@@ -1,5 +1,5 @@
 import { Section, SectionHeading } from "@/components/Section";
-import { companyFunnel } from "@/config/site";
+import { companyFunnel, ctas } from "@/config/site";
 
 export function CompanyFunnel() {
   const f = companyFunnel;
@@ -10,7 +10,7 @@ export function CompanyFunnel() {
           <div>
             <SectionHeading eyebrow={f.pilot.eyebrow} title={f.pilot.title} intro={f.pilot.intro} />
             <p className="mt-6 text-sm leading-relaxed text-ink-soft">Für Unternehmen aus Photovoltaik, Wärmepumpe und Smart Energy, die ein Projekt zeigen können und ihre Inhalte gezielt einsetzen möchten.</p>
-            <a href="#kontakt" className="mt-8 inline-flex items-center gap-5 rounded-theme bg-brand px-6 py-3.5 text-sm font-semibold text-on-brand hover:bg-brand-strong">Pilotprojekt anfragen <span aria-hidden="true">↗</span></a>
+            <a href={ctas.company.href} className="mt-8 inline-flex items-center gap-5 rounded-theme bg-brand px-6 py-3.5 text-sm font-semibold text-on-brand hover:bg-brand-strong">{ctas.company.label} <span aria-hidden="true">↗</span></a>
           </div>
           <div className="rounded-xl border border-line bg-surface p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand">Das ist enthalten</p>
