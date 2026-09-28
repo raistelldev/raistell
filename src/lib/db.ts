@@ -1,5 +1,6 @@
 import postgres from "postgres";
 import { site } from "@/config/site";
+import { getRetentionExpiresAt } from "./lead-retention.mjs";
 
 const globalForDb = globalThis as unknown as {
   sql: ReturnType<typeof postgres> | undefined;
@@ -37,6 +38,7 @@ export async function ensureSchema() {
           created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         )
       `;
+      await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS collaboration_started_at TIMESTAMPTZ`;
       await sql`CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC)`;
       await sql`CREATE INDEX IF NOT EXISTS leads_role_idx ON leads (role)`;
       await sql`CREATE INDEX IF NOT EXISTS leads_email_idx ON leads (email)`;
@@ -66,7 +68,27 @@ export type Lead = {
   name: string;
   payload: Record<string, unknown>;
   created_at: string;
+  collaboration_started_at: string | null;
+  retention_expires_at: string | null;
 };
+
+type LeadRow = Omit<Lead, "created_at" | "collaboration_started_at" | "retention_expires_at"> & {
+  created_at: Date | string;
+  collaboration_started_at: Date | string | null;
+};
+
+function toLead(row: LeadRow): Lead {
+  const createdAt = new Date(row.created_at).toISOString();
+  const collaborationStartedAt = row.collaboration_started_at === null
+    ? null
+    : new Date(row.collaboration_started_at).toISOString();
+  return {
+    ...row,
+    created_at: createdAt,
+    collaboration_started_at: collaborationStartedAt,
+    retention_expires_at: getRetentionExpiresAt(createdAt, collaborationStartedAt),
+  };
+}
 
 export async function insertLead(input: {
   role: LeadRole;
@@ -96,19 +118,21 @@ export async function listLeads(role?: LeadRole) {
   const sql = getSql();
 
   if (role) {
-    return sql<Lead[]>`
-      SELECT id, role, email, name, payload, created_at
+    const rows = await sql<LeadRow[]>`
+      SELECT id, role, email, name, payload, created_at, collaboration_started_at
       FROM leads
       WHERE role = ${role}
       ORDER BY created_at DESC
     `;
+    return rows.map(toLead);
   }
 
-  return sql<Lead[]>`
-    SELECT id, role, email, name, payload, created_at
+  const rows = await sql<LeadRow[]>`
+    SELECT id, role, email, name, payload, created_at, collaboration_started_at
     FROM leads
     ORDER BY created_at DESC
   `;
+  return rows.map(toLead);
 }
 
 export async function listLeadsByIds(ids: string[]) {
@@ -116,12 +140,28 @@ export async function listLeadsByIds(ids: string[]) {
   if (ids.length === 0) return [] as Lead[];
   const sql = getSql();
 
-  return sql<Lead[]>`
-    SELECT id, role, email, name, payload, created_at
+  const rows = await sql<LeadRow[]>`
+    SELECT id, role, email, name, payload, created_at, collaboration_started_at
     FROM leads
     WHERE id IN ${sql(ids)}
     ORDER BY created_at DESC
   `;
+  return rows.map(toLead);
+}
+
+export async function setLeadCollaboration(id: string, hasCollaboration: boolean): Promise<Lead | undefined> {
+  await ensureSchema();
+  const sql = getSql();
+  const [row] = await sql<LeadRow[]>`
+    UPDATE leads
+    SET collaboration_started_at = CASE
+      WHEN ${hasCollaboration} THEN COALESCE(collaboration_started_at, now())
+      ELSE NULL
+    END
+    WHERE id = ${id}
+    RETURNING id, role, email, name, payload, created_at, collaboration_started_at
+  `;
+  return row ? toLead(row) : undefined;
 }
 
 export async function deleteLeadsByIds(ids: string[]) {
