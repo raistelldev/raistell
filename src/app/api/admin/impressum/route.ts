@@ -26,12 +26,16 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { text?: unknown };
+  let input: unknown;
   try {
-    body = (await request.json()) as { text?: unknown };
+    input = await request.json();
   } catch {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
   }
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+  }
+  const body = input as Record<string, unknown>;
 
   if (typeof body.text !== "string") {
     return NextResponse.json(
