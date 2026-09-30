@@ -1,5 +1,6 @@
 "use client";
 
+import { ProjectFilm } from "@/components/project-film/ProjectFilm";
 import { useAudience } from "@/components/AudienceContext";
 import { companyFunnel, creatorFunnel, ctas } from "@/config/site";
 
@@ -19,10 +20,10 @@ export function Hero() {
             </button>
           ))}
         </div>
-        <div className="mt-10 grid items-center gap-10 lg:mt-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-          <div>
+        <div className="mt-10 grid grid-cols-1 items-center gap-10 lg:mt-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
+          <div className="min-w-0">
             <p className="max-w-lg text-xs font-semibold uppercase leading-relaxed tracking-[0.16em] text-on-dark/65">{content.eyebrow}</p>
-            <h1 className="mt-5 max-w-2xl font-brand text-[2.5rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.5rem]">{content.title}</h1>
+            <h1 className="mt-5 max-w-2xl break-words hyphens-auto font-brand text-[2.125rem] font-semibold leading-[1.08] tracking-tight min-[380px]:hyphens-manual min-[380px]:text-[2.5rem] sm:text-5xl lg:text-[3.5rem]">{content.title}</h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-on-dark/80 sm:text-lg">{content.subtitle}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <a href={cta.href} className="inline-flex items-center justify-center gap-4 rounded-theme bg-on-dark px-6 py-3.5 text-sm font-semibold text-brand-strong transition-colors hover:bg-brand-soft">{cta.label}<span aria-hidden="true">↗</span></a>
@@ -30,7 +31,7 @@ export function Hero() {
             </div>
             <p className="mt-5 text-xs leading-relaxed text-on-dark/60">{isCompany ? "Erstgespräch kostenlos und unverbindlich. Umsetzung nach individuellem Angebot." : "Kostenlose Bewerbung. Du entscheidest bei jedem Projekt selbst."}</p>
           </div>
-          {isCompany ? <ProjectStoryboard /> : (
+          {isCompany ? <div className="mx-auto w-full max-w-xl min-w-0 lg:max-w-none"><ProjectFilm /></div> : (
             <div className="rounded-2xl border border-on-dark/15 bg-dark-strong/40 p-7 sm:p-9">
               <p className="text-xs font-semibold uppercase tracking-widest text-on-dark/55">Zwei Wege zur Zusammenarbeit</p>
               <div className="mt-7 border-b border-on-dark/15 pb-7">
@@ -51,21 +52,3 @@ export function Hero() {
   );
 }
 
-function ProjectStoryboard() {
-  return (
-    <div className="rounded-2xl border border-on-dark/20 bg-dark-strong/50 p-5 sm:p-7">
-      <div className="flex items-center justify-between gap-4 text-[11px] font-semibold uppercase tracking-widest text-on-dark/55"><span>Aus einem Projekt wird Content</span><span aria-hidden="true">01 / 04</span></div>
-      <div className="relative mt-5 overflow-hidden rounded-xl bg-surface-alt p-6 text-ink sm:p-7">
-        <p className="relative z-10 text-[10px] font-semibold uppercase tracking-widest text-brand">Beispielkonzept · keine Kundenreferenz</p>
-        <div className="my-6 flex items-center gap-5" aria-hidden="true">
-          <div className="grid -skew-y-6 grid-cols-3 gap-1 rounded-md bg-ink p-2 shadow-lg">{Array.from({ length: 9 }, (_, i) => <span key={i} className="h-6 w-9 rounded-sm border border-on-dark/20 bg-on-dark/10 sm:h-7 sm:w-11" />)}</div>
-          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-brand/25 text-brand"><svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="m8 5 11 7-11 7Z" /></svg></span>
-        </div>
-        <p className="text-xs font-medium text-brand">Das Hauptvideo</p>
-        <p className="mt-2 max-w-xs text-xl font-semibold leading-snug sm:text-2xl">Was passiert am Tag der PV-Installation?</p>
-      </div>
-      <div className="mt-3 grid grid-cols-3 gap-2">{["Vorbereitung", "Einblicke", "Übergabe"].map((label, i) => <div key={label} className="rounded-lg border border-on-dark/15 px-2.5 py-3 sm:px-3"><span className="text-[10px] uppercase tracking-wide text-on-dark/45">Ausschnitt 0{i + 1}</span><p className="mt-1.5 text-xs font-medium text-on-dark/90">{label}</p></div>)}</div>
-      <p className="mt-5 text-xs leading-relaxed text-on-dark/60">Ein Hauptvideo + drei Kurzvideos. Gemeinsam auf Ihren geplanten Einsatz abgestimmt.</p>
-    </div>
-  );
-}
