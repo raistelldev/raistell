@@ -68,7 +68,7 @@ export default async function ServiceDetailPage({
             Dienstleistung
           </p>
         </div>
-        <h1 className="mt-6 font-brand text-4xl font-semibold tracking-tight text-ink md:text-5xl">
+        <h1 className="mt-6 break-words hyphens-auto font-brand text-3xl font-semibold tracking-tight text-ink min-[360px]:text-4xl sm:hyphens-manual md:text-5xl">
           {service.title}
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-ink-soft">{service.description}</p>

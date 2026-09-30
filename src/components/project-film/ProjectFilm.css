@@ -1,0 +1,74 @@
+.projectFilm {width:100%;min-width:0;container-type:inline-size;}
+  .projectFilm * {box-sizing:border-box;}
+  .projectFilm .rm-film {--ink:#173042;--paper:#f7f5ef;--mint:#b5dace;--teal:#137a72;color-scheme:light;font-family:Arial,Helvetica,sans-serif;background:var(--paper);color:var(--ink);max-width:740px;margin:auto;overflow:hidden;border-radius:18px;box-shadow:0 15px 45px #10273518;}
+  .projectFilm .rm-header {display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px 28px;background:#102b34;color:var(--paper);}
+  .projectFilm .rm-logo {font-size:16px;letter-spacing:.22em;font-weight:600;display:flex;align-items:center;gap:9px;}
+  .projectFilm .rm-logo-dot {width:6px;height:6px;border-radius:50%;background:var(--mint);}
+  .projectFilm .rm-edition {font-size:11px;letter-spacing:.11em;color:#b4ccc6;}
+  .projectFilm .rm-stage {position:relative;aspect-ratio:4/3;isolation:isolate;background:#e7e9dc;overflow:hidden;--stage-ink:#173042;}
+  .projectFilm canvas {display:block;width:100%;height:100%;}
+  .projectFilm .rm-overline {position:absolute;inset:23px 28px auto;display:flex;justify-content:space-between;gap:15px;font-size:11px;letter-spacing:.12em;color:var(--stage-ink);opacity:.8;}
+  .projectFilm .rm-copy {position:absolute;top:16%;left:6.1%;right:5%;color:var(--stage-ink);pointer-events:none;}
+  .projectFilm .rm-kicker {font-size:11px;letter-spacing:.13em;margin-bottom:13px;}
+  .projectFilm .rm-headline {font-size:clamp(24px,6.5cqi,47px);font-weight:600;line-height:1.05;letter-spacing:-.055em;}
+  .projectFilm .rm-headline em {font:inherit;font-weight:500;color:var(--stage-accent,#137a72);}
+  .projectFilm .rm-output {position:absolute;left:6.1%;right:5.8%;top:78%;display:grid;grid-template-columns:1fr 1fr;gap:25px;color:var(--paper);font-size:clamp(12px,2.4cqi,17px);letter-spacing:-.025em;opacity:0;pointer-events:none;}
+  .projectFilm .rm-output span:last-child {text-align:center;}
+  .projectFilm .rm-channels {position:absolute;top:87%;left:6.1%;right:6.1%;display:grid;grid-template-columns:1.8fr 1fr;gap:30px;color:var(--paper);font-size:clamp(11px,2.1cqi,15px);letter-spacing:-.015em;opacity:0;pointer-events:none;}
+  .projectFilm .rm-channels span:last-child {text-align:center;}
+  .projectFilm .rm-frame-label {position:absolute;right:5.7%;bottom:17%;font-size:11px;letter-spacing:.09em;color:var(--stage-ink);writing-mode:vertical-rl;}
+  .projectFilm .rm-caption {position:absolute;bottom:5.8%;left:6.1%;right:6.1%;font-size:13px;line-height:1.35;color:var(--stage-ink);}
+  .projectFilm .rm-bottom {padding:21px 28px 18px;background:var(--ink);color:var(--paper);}
+  .projectFilm .rm-transport {display:flex;align-items:center;gap:11px;flex-wrap:wrap;}
+  .projectFilm button {font:inherit;font-size:12px;appearance:none;min-height:44px;}
+  .projectFilm .rm-play {display:flex;justify-content:space-between;align-items:center;gap:25px;border:0;border-radius:5px;padding:12px 16px;min-width:146px;background:var(--paper);color:var(--ink);font-weight:500;}
+  .projectFilm .rm-play:hover {background:#d7e9df;}
+  .projectFilm .rm-play span {font-size:18px;line-height:1;}
+  .projectFilm .rm-reset {border:0;background:none;color:#d1deda;padding:10px 7px;}
+  .projectFilm .rm-loop {display:flex;align-items:center;gap:7px;font-size:12px;color:#d1deda;min-height:44px;margin-left:auto;}
+  .projectFilm .rm-loop input {accent-color:#b5dace;width:16px;height:16px;margin:0;}
+  .projectFilm .rm-timer {font-size:11px;font-variant-numeric:tabular-nums;color:#b5c9c7;white-space:nowrap;}
+  .projectFilm .rm-chapters {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-top:20px;}
+  .projectFilm .rm-chapters button {position:relative;background:none;border:0;color:#a5bcbb;text-align:left;padding:0 0 13px;font-size:12px;white-space:nowrap;}
+  .projectFilm .rm-chapters button span {font-size:11px;display:block;margin-bottom:6px;}
+  .projectFilm .rm-chapters button::after {content:'';position:absolute;height:2px;left:0;right:0;bottom:0;background:#f7f5ef22;}
+  .projectFilm .rm-chapters button i {position:absolute;bottom:0;left:0;height:2px;width:var(--progress,0%);background:#b5dace;z-index:1;}
+  .projectFilm .rm-chapters button[aria-pressed="true"] {color:var(--paper);}
+  .projectFilm .rm-footnote {display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:20px;font-size:11px;line-height:1.4;color:#aec2c0;}
+  .projectFilm .rm-status {letter-spacing:.08em;font-size:11px;}
+  @container (max-width:500px) {
+    .projectFilm .rm-header {padding:20px;}
+    .projectFilm .rm-logo {font-size:14px;}
+    .projectFilm .rm-edition {font-size:11px;letter-spacing:.04em;}
+    .projectFilm .rm-overline {inset:17px 18px auto;letter-spacing:.045em;}
+    .projectFilm .rm-overline span:last-child {display:none;}
+    .projectFilm .rm-copy {top:18%;}
+    .projectFilm .rm-kicker {display:none;}
+    .projectFilm .rm-caption {font-size:11px;bottom:5%;}
+    .projectFilm .rm-frame-label {display:none;}
+    .projectFilm .rm-bottom {padding:17px 18px;}
+    .projectFilm .rm-play {min-width:133px;padding:10px 12px;gap:14px;}
+    .projectFilm .rm-transport {gap:6px;}
+    .projectFilm .rm-loop {margin-left:auto;}
+    .projectFilm .rm-timer {display:none;}
+    .projectFilm .rm-chapters {gap:9px;margin-top:15px;}
+    .projectFilm .rm-chapters button {font-size:11px;}
+    .projectFilm .rm-footnote {margin-top:16px;}
+    .projectFilm .rm-status {display:none;}
+  }
+  @container (max-width:350px) {
+    .projectFilm .rm-header {padding:18px 15px;}
+    .projectFilm .rm-edition {font-size:11px;letter-spacing:0;}
+    .projectFilm .rm-copy {top:10%;}
+    .projectFilm .rm-overline {display:none;}
+    .projectFilm .rm-caption {display:none;}
+    .projectFilm .rm-bottom {padding:15px 12px;}
+    .projectFilm .rm-play {min-width:122px;}
+    .projectFilm .rm-reset {padding:10px 4px;font-size:11px;}
+    .projectFilm .rm-loop {font-size:11px;gap:5px;}
+    .projectFilm .rm-chapters {gap:6px;}
+  }
+.projectFilm button, .projectFilm .rm-loop { cursor: pointer; }
+.projectFilm button:disabled, .projectFilm input:disabled { cursor: wait; opacity: .65; }
+.projectFilm :focus-visible { outline: 2px solid #b5dace; outline-offset: 4px; }
+

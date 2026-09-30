@@ -12,7 +12,7 @@ export function LegalLayout({
       <Link href="/" className="text-sm font-medium text-brand hover:text-brand-strong">
         ← Zurück zur Startseite
       </Link>
-      <h1 className="mt-4 font-brand text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+      <h1 className="mt-4 break-words hyphens-auto font-brand text-[1.625rem] font-semibold tracking-tight text-ink min-[360px]:text-3xl sm:hyphens-manual md:text-4xl">
         {title}
       </h1>
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-ink-soft [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-ink [&_strong]:text-ink">
