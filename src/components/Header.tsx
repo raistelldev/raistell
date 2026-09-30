@@ -147,7 +147,7 @@ export function Header() {
         <nav
           id="mobile-nav"
           aria-label="Hauptnavigation mobil"
-          className="header-facet relative border-t border-line lg:hidden"
+          className="header-facet relative max-h-[calc(100dvh-4rem-1px)] overflow-y-auto overscroll-contain border-t border-line lg:hidden"
         >
           <ul className="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-2">
             {navItems.map((item) => (
